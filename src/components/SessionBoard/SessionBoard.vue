@@ -36,10 +36,10 @@ import {
   topRightText,
 } from "./useSessionBoardParams";
 
-// set preset to UBC AI Safety by default
+// set preset to Co-working session by default
 onMounted(() => {
   if (isParamsEmpty.value) {
-    presets.find((p) => p.name === "UBC AI Safety")?.stages[0].set();
+    presets.find((p) => p.name === "Co-working session")?.stages[0].set();
   }
 });
 
