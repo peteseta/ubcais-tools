@@ -222,7 +222,7 @@ export const presets: {
   stages: { name: string; set: () => void }[];
 }[] = [
   {
-    name: "UBC AI Safety",
+    name: "Co-working session",
     stages: [
       {
         name: "welcome",
@@ -234,11 +234,9 @@ export const presets: {
 
           topRightText.value = "UBC AI Safety";
           qotd.value = "[TODO]";
-          bottomRightNotes.value = "Welcome to UBC AI Safety";
+          bottomRightNotes.value = "Welcome to the co-working session!";
 
-          bottomLeftNotes.value = `# Hosts\n\n${[
-            "[Add host names]",
-          ].join("  \n")}`;
+          bottomLeftNotes.value = ``
           bottomLeftNotesSize.value = 2;
 
           qotdLocation.value = "UBC, Vancouver, BC, Canada";
@@ -252,8 +250,8 @@ export const presets: {
 
           bottomRightNotes.value = `# Intro
 1. Name
-1. What are you working on?
-1. Question of the day`;
+2. What are you working on?
+3. Question of the day`;
           bottomRightNotesSize.value = 2;
         },
       },
@@ -266,7 +264,7 @@ export const presets: {
           bottomRightNotes.value = `Talk to a host for demos (short 2-min max show and tell)`;
           mainContentState.value = "timer";
           countdownToTime.value =
-            currentTimePlusMinutesRoundedToNearest5Minutes(50);
+            currentTimePlusMinutesRoundedToNearest5Minutes(40);
           countdownTitle.value = "Break Starts";
         },
       },
@@ -278,7 +276,7 @@ export const presets: {
 
           mainContentState.value = "timer";
           countdownToTime.value =
-            currentTimePlusMinutesRoundedToNearest5Minutes(10);
+            currentTimePlusMinutesRoundedToNearest5Minutes(5);
           countdownTitle.value = "Break Ends";
         },
       },
@@ -290,7 +288,7 @@ export const presets: {
 
           mainContentState.value = "timer";
           countdownToTime.value =
-            currentTimePlusMinutesRoundedToNearest5Minutes(50);
+            currentTimePlusMinutesRoundedToNearest5Minutes(40);
           countdownTitle.value = "Demos Start";
         },
       },
@@ -313,8 +311,7 @@ export const presets: {
           mainContentState.value = "text";
           centerText.value = `Thank you for coming!\n\nSee you next time`;
 
-          bottomRightNotes.value = `<p style="text-align:end">Learn more at<br>ubcaisafety.org</p>`;
-          bottomRightNotesSize.value = 1;
+          bottomRightNotes.value = `Learn more at ubcaisafety.org`;
         },
       },
     ],

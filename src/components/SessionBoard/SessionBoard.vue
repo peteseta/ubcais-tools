@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import logo from "@/assets/images/session-board/logo.svg?url";
+import logo from "@/assets/images/session-board/logo.png?url";
 import showdown from "showdown";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import CountDownText from "./CountDownText.vue";
@@ -512,7 +512,7 @@ const countdownToTimeString = computed({
       margin: 0;
       font-size: 1.5rem;
       margin-bottom: 1rem;
-      color: #919191;
+      color: #202020ff;
       font-weight: 500;
     }
 
@@ -548,14 +548,14 @@ const countdownToTimeString = computed({
       .countdown {
         font-size: 7rem;
         font-weight: 600;
-        color: rgb(from currentColor r g b / 0.7);
+        color: #202020ff;
       }
 
       .countdown-to {
         margin-top: 1rem;
         font-size: 1.5rem;
         font-weight: 600;
-        color: rgb(from currentColor r g b / 0.6);
+        color: #202020ff;
       }
     }
 
