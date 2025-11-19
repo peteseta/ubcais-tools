@@ -148,26 +148,17 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   shuffleArray(questionBank);
 
   const response = await openai.responses.create({
-    model: "openai/gpt-5-nano",
+    model: "openai/gpt-5.1",
     input: [
-      {
-        role: "system",
-        content: [
-          {
-            type: "input_text",
-            text: `Make 15 ice-breaker question like these:\n${questionBank.join("\n")}\n The first 5 questions should be taken from the examples. The next 5 questions should be similar to but not taken from the examples. The last 5 questions should be related to the user's location and the current date.`,
-          },
-        ],
-      },
       {
         role: "user",
         content: [
           {
             type: "input_text",
-            text: `Location: ${userLocation}}\nDate: ${currentDate}`,
+            text: `Make 15 ice-breaker question like these:\n${questionBank.join("\n")}\n The first 5 questions should be taken from the examples. The next 5 questions should be similar to but not taken from the examples. The last 5 questions should be related to the user's location and the current date. Location: ${userLocation}\nDate: ${currentDate}`,
           },
         ],
-      },
+      }
     ],
     text: {
       format: {
@@ -191,7 +182,6 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         },
       },
     },
-    reasoning: {},
     tools: [],
     temperature: 1,
     max_output_tokens: 2048,

@@ -17,7 +17,7 @@
     "@vueuse/core": "^13.3.0",
     "astro": "^5.5.5",
     "inter-ui": "^4.0.2",
-    "openai": "^4.91.1",
+    "openai": "^4.104.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "showdown": "^2.1.0",
