@@ -141,13 +141,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   const openai = new OpenAI({
     apiKey: context.env.OPENAI_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1'
   });
 
   // Shuffle the question bank to ensure variety
   shuffleArray(questionBank);
 
   const response = await openai.responses.create({
-    model: "gpt-4o",
+    model: "openai/gpt-5-nano",
     input: [
       {
         role: "system",

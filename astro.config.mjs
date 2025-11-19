@@ -12,7 +12,7 @@ export default defineConfig({
     server: {
       proxy: {
         "/api": {
-          target: "https://atelier.place/",
+          target: "https://ubcais-tools.pages.dev/",
           changeOrigin: true,
           secure: false,
         },
