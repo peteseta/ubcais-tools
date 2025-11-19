@@ -723,6 +723,7 @@ const countdownToTimeString = computed({
   .session-board-config {
     background-color: white;
     padding: 1rem;
+    color: #000;
 
     .preset {
       &.selected {
