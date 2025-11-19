@@ -555,7 +555,7 @@ const countdownToTimeString = computed({
         margin-top: 1rem;
         font-size: 1.5rem;
         font-weight: 600;
-        color: #202020ff;
+        color: rgba(68, 68, 68, 0.25);
       }
     }
 
@@ -565,7 +565,7 @@ const countdownToTimeString = computed({
         :deep(ol) {
           font-size: 1.7rem;
           font-weight: 500;
-          color: rgb(from currentColor r g b / 0.8);
+          color: rgba(68, 68, 68, 0.25);
         }
       }
       .size-2 {
