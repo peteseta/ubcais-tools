@@ -1,0 +1,448 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Spectrum Activity - UBC AI Safety">
+  <main>
+    <div class="spectrum-container">
+      <div class="side-label left">DISAGREE</div>
+      <div class="side-label right">AGREE</div>
+
+      <div class="content-area">
+        <div class="prompt-section">
+          <label for="prompt">Prompt:</label>
+          <textarea
+            id="prompt"
+            placeholder="Enter the spectrum prompt here..."
+            rows="3"
+          ></textarea>
+          <button id="displayPrompt" class="btn-primary">Display Prompt</button>
+        </div>
+
+        <div id="promptDisplay" class="prompt-display hidden">
+          <div class="prompt-text"></div>
+        </div>
+
+        <div class="timer-controls">
+          <div class="timer-section">
+            <h3>Discussion Timer</h3>
+            <div class="timer-input">
+              <input type="number" id="discussionMinutes" min="0" max="60" value="2" />
+              <span>minutes</span>
+            </div>
+            <button id="startDiscussion" class="btn-primary">Start Discussion</button>
+            <div id="discussionTimer" class="timer-display">00:00</div>
+          </div>
+
+          <div class="timer-section">
+            <h3>Side Speaking Timers</h3>
+            <div class="timer-input">
+              <input type="number" id="sideMinutes" min="0" max="10" value="1" />
+              <span>minutes per side</span>
+            </div>
+            <button id="startSideSpeaking" class="btn-primary">Start Side Speaking</button>
+            <div id="currentSide" class="current-side"></div>
+            <div id="sideTimer" class="timer-display">00:00</div>
+          </div>
+        </div>
+
+        <button id="reset" class="btn-secondary">Reset All</button>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style lang="scss">
+  @use "../colors.scss";
+
+  main {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .spectrum-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .side-label {
+    position: absolute;
+    font-size: 4rem;
+    font-weight: 700;
+    font-family: "IBM Plex Sans", sans-serif;
+    color: colors.$primary-text;
+    opacity: 0.3;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+
+    &.left {
+      left: 2rem;
+      top: 50%;
+      transform: translateY(-50%) rotate(180deg);
+      color: colors.$accent-dark;
+    }
+
+    &.right {
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: colors.$accent-primary;
+    }
+  }
+
+  .content-area {
+    max-width: 800px;
+    width: 90%;
+    padding: 2rem;
+    background: colors.$secondary-bg;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .prompt-section {
+    margin-bottom: 2rem;
+
+    label {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: colors.$primary-text;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-family: "IBM Plex Sans", sans-serif;
+      background: colors.$primary-bg;
+      color: colors.$primary-text;
+      border: 2px solid colors.$accent-primary;
+      border-radius: 0.5rem;
+      resize: vertical;
+
+      &:focus {
+        outline: none;
+        border-color: colors.$accent-dark;
+      }
+    }
+  }
+
+  .prompt-display {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: colors.$primary-bg;
+    border-radius: 0.5rem;
+    border: 3px solid colors.$accent-primary;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.hidden {
+      display: none;
+    }
+
+    .prompt-text {
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      color: colors.$primary-text;
+      line-height: 1.4;
+    }
+  }
+
+  .timer-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .timer-section {
+    h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: colors.$primary-text;
+    }
+
+    .timer-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+
+      input {
+        width: 80px;
+        padding: 0.5rem;
+        font-size: 1.1rem;
+        background: colors.$primary-bg;
+        color: colors.$primary-text;
+        border: 2px solid colors.$accent-primary;
+        border-radius: 0.5rem;
+        text-align: center;
+
+        &:focus {
+          outline: none;
+          border-color: colors.$accent-dark;
+        }
+      }
+
+      span {
+        color: colors.$primary-text;
+      }
+    }
+  }
+
+  .timer-display {
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    color: colors.$accent-primary;
+    margin: 1rem 0;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .current-side {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    min-height: 2.5rem;
+
+    &.disagree {
+      background: colors.$accent-dark;
+      color: white;
+    }
+
+    &.agree {
+      background: colors.$accent-primary;
+      color: white;
+    }
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-family: "IBM Plex Sans", sans-serif;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .btn-primary {
+    background: colors.$accent-primary;
+    color: white;
+    margin-bottom: 1rem;
+
+    &:hover {
+      background: colors.$accent-dark;
+    }
+  }
+
+  .btn-secondary {
+    background: colors.$secondary-bg;
+    color: colors.$primary-text;
+    border: 2px solid colors.$accent-primary;
+    margin-top: 1rem;
+
+    &:hover {
+      background: colors.$primary-bg;
+    }
+  }
+</style>
+
+<script>
+  let discussionInterval: number | null = null;
+  let sideInterval: number | null = null;
+  let currentSideValue: 'disagree' | 'agree' = 'disagree';
+
+  const promptTextarea = document.getElementById('prompt') as HTMLTextAreaElement;
+  const displayPromptBtn = document.getElementById('displayPrompt') as HTMLButtonElement;
+  const promptDisplay = document.getElementById('promptDisplay') as HTMLDivElement;
+  const promptText = promptDisplay?.querySelector('.prompt-text') as HTMLDivElement;
+
+  const discussionMinutesInput = document.getElementById('discussionMinutes') as HTMLInputElement;
+  const startDiscussionBtn = document.getElementById('startDiscussion') as HTMLButtonElement;
+  const discussionTimerDisplay = document.getElementById('discussionTimer') as HTMLDivElement;
+
+  const sideMinutesInput = document.getElementById('sideMinutes') as HTMLInputElement;
+  const startSideSpeakingBtn = document.getElementById('startSideSpeaking') as HTMLButtonElement;
+  const currentSideDisplay = document.getElementById('currentSide') as HTMLDivElement;
+  const sideTimerDisplay = document.getElementById('sideTimer') as HTMLDivElement;
+
+  const resetBtn = document.getElementById('reset') as HTMLButtonElement;
+
+  // Audio notification
+  const playSound = () => {
+    const audioContext = new AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  displayPromptBtn?.addEventListener('click', () => {
+    const prompt = promptTextarea.value.trim();
+    if (prompt) {
+      promptText.textContent = prompt;
+      promptDisplay.classList.remove('hidden');
+    }
+  });
+
+  startDiscussionBtn?.addEventListener('click', () => {
+    if (discussionInterval) {
+      clearInterval(discussionInterval);
+      discussionInterval = null;
+      startDiscussionBtn.textContent = 'Start Discussion';
+      return;
+    }
+
+    const minutes = parseInt(discussionMinutesInput.value) || 2;
+    let timeLeft = minutes * 60;
+
+    discussionTimerDisplay.textContent = formatTime(timeLeft);
+    startDiscussionBtn.textContent = 'Stop Discussion';
+
+    discussionInterval = window.setInterval(() => {
+      timeLeft--;
+      discussionTimerDisplay.textContent = formatTime(timeLeft);
+
+      if (timeLeft <= 0) {
+        clearInterval(discussionInterval!);
+        discussionInterval = null;
+        startDiscussionBtn.textContent = 'Start Discussion';
+        playSound();
+        discussionTimerDisplay.style.color = '#cc4125';
+        setTimeout(() => {
+          discussionTimerDisplay.style.color = '';
+        }, 2000);
+      }
+    }, 1000);
+  });
+
+  startSideSpeakingBtn?.addEventListener('click', () => {
+    if (sideInterval) {
+      clearInterval(sideInterval);
+      sideInterval = null;
+      startSideSpeakingBtn.textContent = 'Start Side Speaking';
+      currentSideDisplay.textContent = '';
+      currentSideDisplay.className = 'current-side';
+      return;
+    }
+
+    const minutes = parseInt(sideMinutesInput.value) || 1;
+    let timeLeft = minutes * 60;
+    currentSideValue = 'disagree';
+
+    const updateSideDisplay = () => {
+      currentSideDisplay.textContent = currentSideValue === 'disagree' ? 'DISAGREE SPEAKS' : 'AGREE SPEAKS';
+      currentSideDisplay.className = `current-side ${currentSideValue}`;
+    };
+
+    updateSideDisplay();
+    sideTimerDisplay.textContent = formatTime(timeLeft);
+    startSideSpeakingBtn.textContent = 'Stop Speaking';
+
+    sideInterval = window.setInterval(() => {
+      timeLeft--;
+      sideTimerDisplay.textContent = formatTime(timeLeft);
+
+      if (timeLeft <= 0) {
+        playSound();
+
+        // Switch sides
+        currentSideValue = currentSideValue === 'disagree' ? 'agree' : 'disagree';
+        updateSideDisplay();
+
+        // Reset timer
+        timeLeft = parseInt(sideMinutesInput.value) * 60 || 60;
+        sideTimerDisplay.style.color = '#cc4125';
+        setTimeout(() => {
+          sideTimerDisplay.style.color = '';
+        }, 1000);
+      }
+    }, 1000);
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    // Clear intervals
+    if (discussionInterval) {
+      clearInterval(discussionInterval);
+      discussionInterval = null;
+    }
+    if (sideInterval) {
+      clearInterval(sideInterval);
+      sideInterval = null;
+    }
+
+    // Reset UI
+    promptTextarea.value = '';
+    promptDisplay.classList.add('hidden');
+    promptText.textContent = '';
+
+    discussionMinutesInput.value = '2';
+    discussionTimerDisplay.textContent = '00:00';
+    startDiscussionBtn.textContent = 'Start Discussion';
+
+    sideMinutesInput.value = '1';
+    sideTimerDisplay.textContent = '00:00';
+    currentSideDisplay.textContent = '';
+    currentSideDisplay.className = 'current-side';
+    startSideSpeakingBtn.textContent = 'Start Side Speaking';
+  });
+</script>
+</Layout>
