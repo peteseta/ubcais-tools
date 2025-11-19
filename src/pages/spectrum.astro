@@ -4,49 +4,60 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout title="Spectrum Activity - UBC AI Safety">
   <main>
-    <div class="spectrum-container">
+    <!-- Configuration Page -->
+    <div id="configPage" class="config-page">
+      <div class="config-container">
+        <h1>Spectrum Activity Configuration</h1>
+
+        <div class="config-section">
+          <h2>Session Prompts</h2>
+          <div id="promptsList" class="prompts-list"></div>
+          <button id="addPrompt" class="btn-primary">+ Add Prompt</button>
+        </div>
+
+        <div class="config-section">
+          <h2>Timer Settings</h2>
+          <div class="timer-config">
+            <div class="config-input">
+              <label for="discussionTime">Discussion Time:</label>
+              <input type="number" id="discussionTime" min="1" max="30" value="5" />
+              <span>minutes</span>
+            </div>
+            <div class="config-input">
+              <label for="debateTime">Debate Time (per side):</label>
+              <input type="number" id="debateTime" min="1" max="10" value="2" />
+              <span>minutes</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="startSession" class="btn-start">Start Session</button>
+      </div>
+    </div>
+
+    <!-- Display Page -->
+    <div id="displayPage" class="display-page hidden">
       <div class="side-label left">DISAGREE</div>
       <div class="side-label right">AGREE</div>
 
-      <div class="content-area">
-        <div class="prompt-section">
-          <label for="prompt">Prompt:</label>
-          <textarea
-            id="prompt"
-            placeholder="Enter the spectrum prompt here..."
-            rows="3"
-          ></textarea>
-          <button id="displayPrompt" class="btn-primary">Display Prompt</button>
+      <div class="display-content">
+        <div class="prompt-display">
+          <div id="currentPrompt" class="current-prompt"></div>
         </div>
 
-        <div id="promptDisplay" class="prompt-display hidden">
-          <div class="prompt-text"></div>
+        <div class="timer-container">
+          <div id="timerDisplay" class="timer-display">00:00</div>
+          <div id="sideIndicator" class="side-indicator hidden"></div>
         </div>
 
-        <div class="timer-controls">
-          <div class="timer-section">
-            <h3>Discussion Timer</h3>
-            <div class="timer-input">
-              <input type="number" id="discussionMinutes" min="0" max="60" value="2" />
-              <span>minutes</span>
-            </div>
-            <button id="startDiscussion" class="btn-primary">Start Discussion</button>
-            <div id="discussionTimer" class="timer-display">00:00</div>
-          </div>
-
-          <div class="timer-section">
-            <h3>Side Speaking Timers</h3>
-            <div class="timer-input">
-              <input type="number" id="sideMinutes" min="0" max="10" value="1" />
-              <span>minutes per side</span>
-            </div>
-            <button id="startSideSpeaking" class="btn-primary">Start Side Speaking</button>
-            <div id="currentSide" class="current-side"></div>
-            <div id="sideTimer" class="timer-display">00:00</div>
-          </div>
+        <div class="controls">
+          <button id="prevPrompt" class="btn-control">← Previous</button>
+          <button id="startDiscussion" class="btn-control">Start Discussion</button>
+          <button id="startDebate" class="btn-control">Start Debate</button>
+          <button id="stopTimer" class="btn-control hidden">Stop Timer</button>
+          <button id="nextPrompt" class="btn-control">Next →</button>
+          <button id="backToConfig" class="btn-control">⚙ Config</button>
         </div>
-
-        <button id="reset" class="btn-secondary">Reset All</button>
       </div>
     </div>
   </main>
@@ -62,185 +73,135 @@ import Layout from "../layouts/Layout.astro";
     position: relative;
   }
 
-  .spectrum-container {
+  .hidden {
+    display: none !important;
+  }
+
+  // Configuration Page Styles
+  .config-page {
     width: 100%;
     height: 100%;
     display: flex;
-    justify-content: center;
     align-items: center;
-    position: relative;
-  }
-
-  .side-label {
-    position: absolute;
-    font-size: 4rem;
-    font-weight: 700;
-    font-family: "IBM Plex Sans", sans-serif;
-    color: colors.$primary-text;
-    opacity: 0.3;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-
-    &.left {
-      left: 2rem;
-      top: 50%;
-      transform: translateY(-50%) rotate(180deg);
-      color: colors.$accent-dark;
-    }
-
-    &.right {
-      right: 2rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: colors.$accent-primary;
-    }
-  }
-
-  .content-area {
-    max-width: 800px;
-    width: 90%;
+    justify-content: center;
+    background: colors.$primary-bg;
     padding: 2rem;
-    background: colors.$secondary-bg;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   }
 
-  .prompt-section {
-    margin-bottom: 2rem;
+  .config-container {
+    max-width: 800px;
+    width: 100%;
+    background: colors.$secondary-bg;
+    padding: 3rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 
-    label {
-      display: block;
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
+    h1 {
+      font-size: 2.5rem;
       color: colors.$primary-text;
+      margin-bottom: 2rem;
+      text-align: center;
     }
+
+    h2 {
+      font-size: 1.5rem;
+      color: colors.$primary-text;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .config-section {
+    margin-bottom: 2rem;
+  }
+
+  .prompts-list {
+    margin-bottom: 1rem;
+  }
+
+  .prompt-item {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
 
     textarea {
-      width: 100%;
-      padding: 1rem;
-      font-size: 1.1rem;
+      flex: 1;
+      padding: 0.75rem;
+      font-size: 1rem;
       font-family: "IBM Plex Sans", sans-serif;
       background: colors.$primary-bg;
       color: colors.$primary-text;
       border: 2px solid colors.$accent-primary;
       border-radius: 0.5rem;
       resize: vertical;
+      min-height: 60px;
 
       &:focus {
         outline: none;
         border-color: colors.$accent-dark;
       }
     }
-  }
 
-  .prompt-display {
-    margin: 2rem 0;
-    padding: 2rem;
-    background: colors.$primary-bg;
-    border-radius: 0.5rem;
-    border: 3px solid colors.$accent-primary;
-    min-height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &.hidden {
-      display: none;
-    }
-
-    .prompt-text {
-      font-size: 2rem;
-      font-weight: 600;
-      text-align: center;
-      color: colors.$primary-text;
-      line-height: 1.4;
-    }
-  }
-
-  .timer-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin: 2rem 0;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .timer-section {
-    h3 {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-      color: colors.$primary-text;
-    }
-
-    .timer-input {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-
-      input {
-        width: 80px;
-        padding: 0.5rem;
-        font-size: 1.1rem;
-        background: colors.$primary-bg;
-        color: colors.$primary-text;
-        border: 2px solid colors.$accent-primary;
-        border-radius: 0.5rem;
-        text-align: center;
-
-        &:focus {
-          outline: none;
-          border-color: colors.$accent-dark;
-        }
-      }
-
-      span {
-        color: colors.$primary-text;
-      }
-    }
-  }
-
-  .timer-display {
-    font-size: 3rem;
-    font-weight: 700;
-    text-align: center;
-    color: colors.$accent-primary;
-    margin: 1rem 0;
-    font-family: "IBM Plex Mono", monospace;
-  }
-
-  .current-side {
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-align: center;
-    margin: 1rem 0;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    min-height: 2.5rem;
-
-    &.disagree {
+    button {
+      padding: 0.5rem 1rem;
       background: colors.$accent-dark;
       color: white;
-    }
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-family: "IBM Plex Sans", sans-serif;
+      transition: all 0.2s;
 
-    &.agree {
-      background: colors.$accent-primary;
-      color: white;
+      &:hover {
+        background: darken(colors.$accent-dark, 10%);
+      }
     }
   }
 
-  .btn-primary,
-  .btn-secondary {
+  .timer-config {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .config-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    label {
+      min-width: 180px;
+      font-weight: 600;
+      color: colors.$primary-text;
+    }
+
+    input {
+      width: 80px;
+      padding: 0.5rem;
+      font-size: 1rem;
+      background: colors.$primary-bg;
+      color: colors.$primary-text;
+      border: 2px solid colors.$accent-primary;
+      border-radius: 0.5rem;
+      text-align: center;
+
+      &:focus {
+        outline: none;
+        border-color: colors.$accent-dark;
+      }
+    }
+
+    span {
+      color: colors.$primary-text;
+    }
+  }
+
+  .btn-primary {
     width: 100%;
     padding: 1rem;
     font-size: 1.1rem;
     font-weight: 600;
+    background: colors.$accent-primary;
+    color: white;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
@@ -248,6 +209,7 @@ import Layout from "../layouts/Layout.astro";
     transition: all 0.2s;
 
     &:hover {
+      background: colors.$accent-dark;
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
@@ -255,60 +217,257 @@ import Layout from "../layouts/Layout.astro";
     &:active {
       transform: translateY(0);
     }
+  }
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+  .btn-start {
+    width: 100%;
+    padding: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: colors.$accent-primary;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-family: "IBM Plex Sans", sans-serif;
+    transition: all 0.2s;
+    margin-top: 2rem;
 
-      &:hover {
-        transform: none;
-        box-shadow: none;
+    &:hover {
+      background: colors.$accent-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  // Display Page Styles
+  .display-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: colors.$primary-bg;
+  }
+
+  .side-label {
+    position: absolute;
+    font-size: 5rem;
+    font-weight: 700;
+    font-family: "IBM Plex Sans", sans-serif;
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transition: opacity 0.3s;
+
+    &.left {
+      left: 3rem;
+      top: 50%;
+      transform: translateY(-50%) rotate(180deg);
+      color: colors.$accent-dark;
+
+      &.highlight {
+        opacity: 1;
+        font-size: 6rem;
+      }
+    }
+
+    &.right {
+      right: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: colors.$accent-primary;
+
+      &.highlight {
+        opacity: 1;
+        font-size: 6rem;
       }
     }
   }
 
-  .btn-primary {
-    background: colors.$accent-primary;
-    color: white;
-    margin-bottom: 1rem;
+  .display-content {
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
 
-    &:hover {
-      background: colors.$accent-dark;
+  .prompt-display {
+    width: 100%;
+    padding: 3rem;
+    background: colors.$secondary-bg;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .current-prompt {
+    font-size: 3rem;
+    font-weight: 600;
+    text-align: center;
+    color: colors.$primary-text;
+    line-height: 1.4;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .timer-display {
+    font-size: 5rem;
+    font-weight: 700;
+    text-align: center;
+    color: colors.$accent-primary;
+    font-family: "IBM Plex Mono", monospace;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.warning {
+      color: #cc4125;
+      animation: pulse 1s infinite;
     }
   }
 
-  .btn-secondary {
-    background: colors.$secondary-bg;
-    color: colors.$primary-text;
-    border: 2px solid colors.$accent-primary;
-    margin-top: 1rem;
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
 
-    &:hover {
-      background: colors.$primary-bg;
+  .side-indicator {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 1rem 3rem;
+    border-radius: 0.5rem;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+
+    &.disagree {
+      background: colors.$accent-dark;
+    }
+
+    &.agree {
+      background: colors.$accent-primary;
+    }
+  }
+
+  .controls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: colors.$secondary-bg;
+      color: colors.$primary-text;
+      border: 2px solid colors.$accent-primary;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-family: "IBM Plex Sans", sans-serif;
+      transition: all 0.2s;
+
+      &:hover {
+        background: colors.$accent-primary;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+
+        &:hover {
+          transform: none;
+          box-shadow: none;
+          background: colors.$secondary-bg;
+          color: colors.$primary-text;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .current-prompt {
+      font-size: 2rem;
+    }
+
+    .timer-display {
+      font-size: 3.5rem;
+    }
+
+    .side-label {
+      font-size: 3rem;
+
+      &.highlight {
+        font-size: 4rem;
+      }
+    }
+
+    .side-indicator {
+      font-size: 1.8rem;
     }
   }
 </style>
 
 <script>
-  let discussionInterval: number | null = null;
-  let sideInterval: number | null = null;
-  let currentSideValue: 'disagree' | 'agree' = 'disagree';
+  type TimerMode = 'discussion' | 'debate' | null;
 
-  const promptTextarea = document.getElementById('prompt') as HTMLTextAreaElement;
-  const displayPromptBtn = document.getElementById('displayPrompt') as HTMLButtonElement;
-  const promptDisplay = document.getElementById('promptDisplay') as HTMLDivElement;
-  const promptText = promptDisplay?.querySelector('.prompt-text') as HTMLDivElement;
+  let prompts: string[] = [];
+  let currentPromptIndex = 0;
+  let discussionMinutes = 5;
+  let debateMinutes = 2;
+  let timerInterval: number | null = null;
+  let currentMode: TimerMode = null;
+  let currentSide: 'disagree' | 'agree' = 'disagree';
 
-  const discussionMinutesInput = document.getElementById('discussionMinutes') as HTMLInputElement;
+  // Elements
+  const configPage = document.getElementById('configPage') as HTMLDivElement;
+  const displayPage = document.getElementById('displayPage') as HTMLDivElement;
+  const promptsList = document.getElementById('promptsList') as HTMLDivElement;
+  const addPromptBtn = document.getElementById('addPrompt') as HTMLButtonElement;
+  const discussionTimeInput = document.getElementById('discussionTime') as HTMLInputElement;
+  const debateTimeInput = document.getElementById('debateTime') as HTMLInputElement;
+  const startSessionBtn = document.getElementById('startSession') as HTMLButtonElement;
+
+  const currentPromptEl = document.getElementById('currentPrompt') as HTMLDivElement;
+  const timerDisplay = document.getElementById('timerDisplay') as HTMLDivElement;
+  const sideIndicator = document.getElementById('sideIndicator') as HTMLDivElement;
+  const leftLabel = document.querySelector('.side-label.left') as HTMLDivElement;
+  const rightLabel = document.querySelector('.side-label.right') as HTMLDivElement;
+
+  const prevPromptBtn = document.getElementById('prevPrompt') as HTMLButtonElement;
+  const nextPromptBtn = document.getElementById('nextPrompt') as HTMLButtonElement;
   const startDiscussionBtn = document.getElementById('startDiscussion') as HTMLButtonElement;
-  const discussionTimerDisplay = document.getElementById('discussionTimer') as HTMLDivElement;
-
-  const sideMinutesInput = document.getElementById('sideMinutes') as HTMLInputElement;
-  const startSideSpeakingBtn = document.getElementById('startSideSpeaking') as HTMLButtonElement;
-  const currentSideDisplay = document.getElementById('currentSide') as HTMLDivElement;
-  const sideTimerDisplay = document.getElementById('sideTimer') as HTMLDivElement;
-
-  const resetBtn = document.getElementById('reset') as HTMLButtonElement;
+  const startDebateBtn = document.getElementById('startDebate') as HTMLButtonElement;
+  const stopTimerBtn = document.getElementById('stopTimer') as HTMLButtonElement;
+  const backToConfigBtn = document.getElementById('backToConfig') as HTMLButtonElement;
 
   // Audio notification
   const playSound = () => {
@@ -335,114 +494,221 @@ import Layout from "../layouts/Layout.astro";
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  displayPromptBtn?.addEventListener('click', () => {
-    const prompt = promptTextarea.value.trim();
-    if (prompt) {
-      promptText.textContent = prompt;
-      promptDisplay.classList.remove('hidden');
-    }
-  });
+  // Add a new prompt input
+  const addPromptInput = (value = '') => {
+    const item = document.createElement('div');
+    item.className = 'prompt-item';
 
-  startDiscussionBtn?.addEventListener('click', () => {
-    if (discussionInterval) {
-      clearInterval(discussionInterval);
-      discussionInterval = null;
-      startDiscussionBtn.textContent = 'Start Discussion';
+    const textarea = document.createElement('textarea');
+    textarea.placeholder = 'Enter a prompt...';
+    textarea.value = value;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', () => item.remove());
+
+    item.appendChild(textarea);
+    item.appendChild(removeBtn);
+    promptsList.appendChild(item);
+  };
+
+  // Initialize with one prompt
+  addPromptInput();
+
+  addPromptBtn.addEventListener('click', () => addPromptInput());
+
+  // Start session
+  startSessionBtn.addEventListener('click', () => {
+    // Collect prompts
+    const textareas = promptsList.querySelectorAll('textarea');
+    prompts = Array.from(textareas)
+      .map(ta => ta.value.trim())
+      .filter(p => p.length > 0);
+
+    if (prompts.length === 0) {
+      alert('Please add at least one prompt');
       return;
     }
 
-    const minutes = parseInt(discussionMinutesInput.value) || 2;
-    let timeLeft = minutes * 60;
+    // Get timer settings
+    discussionMinutes = parseInt(discussionTimeInput.value) || 5;
+    debateMinutes = parseInt(debateTimeInput.value) || 2;
 
-    discussionTimerDisplay.textContent = formatTime(timeLeft);
-    startDiscussionBtn.textContent = 'Stop Discussion';
+    // Switch to display page
+    currentPromptIndex = 0;
+    showDisplayPage();
+  });
 
-    discussionInterval = window.setInterval(() => {
+  const showDisplayPage = () => {
+    configPage.classList.add('hidden');
+    displayPage.classList.remove('hidden');
+    updatePromptDisplay();
+    updateNavigationButtons();
+  };
+
+  const showConfigPage = () => {
+    displayPage.classList.add('hidden');
+    configPage.classList.remove('hidden');
+    stopCurrentTimer();
+  };
+
+  const updatePromptDisplay = () => {
+    if (prompts.length > 0) {
+      currentPromptEl.textContent = prompts[currentPromptIndex];
+    }
+  };
+
+  const updateNavigationButtons = () => {
+    prevPromptBtn.disabled = currentPromptIndex === 0;
+    nextPromptBtn.disabled = currentPromptIndex === prompts.length - 1;
+  };
+
+  const stopCurrentTimer = () => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    currentMode = null;
+    timerDisplay.textContent = '00:00';
+    timerDisplay.classList.remove('warning');
+    sideIndicator.classList.add('hidden');
+    leftLabel.classList.remove('highlight');
+    rightLabel.classList.remove('highlight');
+    startDiscussionBtn.classList.remove('hidden');
+    startDebateBtn.classList.remove('hidden');
+    stopTimerBtn.classList.add('hidden');
+  };
+
+  const startDiscussion = () => {
+    stopCurrentTimer();
+    currentMode = 'discussion';
+
+    let timeLeft = discussionMinutes * 60;
+    timerDisplay.textContent = formatTime(timeLeft);
+    sideIndicator.classList.add('hidden');
+
+    startDiscussionBtn.classList.add('hidden');
+    startDebateBtn.classList.add('hidden');
+    stopTimerBtn.classList.remove('hidden');
+
+    timerInterval = window.setInterval(() => {
       timeLeft--;
-      discussionTimerDisplay.textContent = formatTime(timeLeft);
+      timerDisplay.textContent = formatTime(timeLeft);
+
+      if (timeLeft <= 10 && timeLeft > 0) {
+        timerDisplay.classList.add('warning');
+      }
 
       if (timeLeft <= 0) {
-        clearInterval(discussionInterval!);
-        discussionInterval = null;
-        startDiscussionBtn.textContent = 'Start Discussion';
+        clearInterval(timerInterval!);
+        timerInterval = null;
         playSound();
-        discussionTimerDisplay.style.color = '#cc4125';
+        timerDisplay.classList.add('warning');
         setTimeout(() => {
-          discussionTimerDisplay.style.color = '';
+          stopCurrentTimer();
         }, 2000);
       }
     }, 1000);
-  });
+  };
 
-  startSideSpeakingBtn?.addEventListener('click', () => {
-    if (sideInterval) {
-      clearInterval(sideInterval);
-      sideInterval = null;
-      startSideSpeakingBtn.textContent = 'Start Side Speaking';
-      currentSideDisplay.textContent = '';
-      currentSideDisplay.className = 'current-side';
-      return;
-    }
+  const startDebate = () => {
+    stopCurrentTimer();
+    currentMode = 'debate';
+    currentSide = 'disagree';
 
-    const minutes = parseInt(sideMinutesInput.value) || 1;
-    let timeLeft = minutes * 60;
-    currentSideValue = 'disagree';
+    let timeLeft = debateMinutes * 60;
 
     const updateSideDisplay = () => {
-      currentSideDisplay.textContent = currentSideValue === 'disagree' ? 'DISAGREE SPEAKS' : 'AGREE SPEAKS';
-      currentSideDisplay.className = `current-side ${currentSideValue}`;
+      sideIndicator.textContent = currentSide === 'disagree' ? 'DISAGREE SPEAKS' : 'AGREE SPEAKS';
+      sideIndicator.className = `side-indicator ${currentSide}`;
+      sideIndicator.classList.remove('hidden');
+
+      // Highlight the speaking side
+      if (currentSide === 'disagree') {
+        leftLabel.classList.add('highlight');
+        rightLabel.classList.remove('highlight');
+      } else {
+        rightLabel.classList.add('highlight');
+        leftLabel.classList.remove('highlight');
+      }
     };
 
     updateSideDisplay();
-    sideTimerDisplay.textContent = formatTime(timeLeft);
-    startSideSpeakingBtn.textContent = 'Stop Speaking';
+    timerDisplay.textContent = formatTime(timeLeft);
 
-    sideInterval = window.setInterval(() => {
+    startDiscussionBtn.classList.add('hidden');
+    startDebateBtn.classList.add('hidden');
+    stopTimerBtn.classList.remove('hidden');
+
+    timerInterval = window.setInterval(() => {
       timeLeft--;
-      sideTimerDisplay.textContent = formatTime(timeLeft);
+      timerDisplay.textContent = formatTime(timeLeft);
+
+      if (timeLeft <= 10 && timeLeft > 0) {
+        timerDisplay.classList.add('warning');
+      }
 
       if (timeLeft <= 0) {
         playSound();
 
         // Switch sides
-        currentSideValue = currentSideValue === 'disagree' ? 'agree' : 'disagree';
+        currentSide = currentSide === 'disagree' ? 'agree' : 'disagree';
         updateSideDisplay();
 
         // Reset timer
-        timeLeft = parseInt(sideMinutesInput.value) * 60 || 60;
-        sideTimerDisplay.style.color = '#cc4125';
-        setTimeout(() => {
-          sideTimerDisplay.style.color = '';
-        }, 1000);
+        timeLeft = debateMinutes * 60;
+        timerDisplay.classList.remove('warning');
       }
     }, 1000);
+  };
+
+  // Event listeners
+  prevPromptBtn.addEventListener('click', () => {
+    if (currentPromptIndex > 0) {
+      currentPromptIndex--;
+      updatePromptDisplay();
+      updateNavigationButtons();
+      stopCurrentTimer();
+    }
   });
 
-  resetBtn?.addEventListener('click', () => {
-    // Clear intervals
-    if (discussionInterval) {
-      clearInterval(discussionInterval);
-      discussionInterval = null;
+  nextPromptBtn.addEventListener('click', () => {
+    if (currentPromptIndex < prompts.length - 1) {
+      currentPromptIndex++;
+      updatePromptDisplay();
+      updateNavigationButtons();
+      stopCurrentTimer();
     }
-    if (sideInterval) {
-      clearInterval(sideInterval);
-      sideInterval = null;
+  });
+
+  startDiscussionBtn.addEventListener('click', startDiscussion);
+  startDebateBtn.addEventListener('click', startDebate);
+  stopTimerBtn.addEventListener('click', stopCurrentTimer);
+  backToConfigBtn.addEventListener('click', showConfigPage);
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (configPage.classList.contains('hidden')) {
+      // Display page shortcuts
+      if (e.key === 'ArrowLeft' && !prevPromptBtn.disabled) {
+        prevPromptBtn.click();
+      } else if (e.key === 'ArrowRight' && !nextPromptBtn.disabled) {
+        nextPromptBtn.click();
+      } else if (e.key === 'd' || e.key === 'D') {
+        if (!startDiscussionBtn.classList.contains('hidden')) {
+          startDiscussion();
+        }
+      } else if (e.key === 'b' || e.key === 'B') {
+        if (!startDebateBtn.classList.contains('hidden')) {
+          startDebate();
+        }
+      } else if (e.key === 's' || e.key === 'S' || e.key === ' ') {
+        if (!stopTimerBtn.classList.contains('hidden')) {
+          e.preventDefault();
+          stopCurrentTimer();
+        }
+      }
     }
-
-    // Reset UI
-    promptTextarea.value = '';
-    promptDisplay.classList.add('hidden');
-    promptText.textContent = '';
-
-    discussionMinutesInput.value = '2';
-    discussionTimerDisplay.textContent = '00:00';
-    startDiscussionBtn.textContent = 'Start Discussion';
-
-    sideMinutesInput.value = '1';
-    sideTimerDisplay.textContent = '00:00';
-    currentSideDisplay.textContent = '';
-    currentSideDisplay.className = 'current-side';
-    startSideSpeakingBtn.textContent = 'Start Side Speaking';
   });
 </script>
 </Layout>
