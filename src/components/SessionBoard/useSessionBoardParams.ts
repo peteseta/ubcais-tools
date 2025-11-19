@@ -229,7 +229,7 @@ export const presets: {
         set() {
           reset();
 
-          selectedPreset.value = "UBC AI Safety";
+          selectedPreset.value = "Co-working session";
           selectedPresetStage.value = "welcome";
 
           topRightText.value = "UBC AI Safety";
@@ -245,7 +245,7 @@ export const presets: {
       {
         name: "intro",
         set() {
-          selectedPreset.value = "UBC AI Safety";
+          selectedPreset.value = "Co-working session";
           selectedPresetStage.value = "intro";
 
           bottomRightNotes.value = `# Intro
@@ -258,10 +258,10 @@ export const presets: {
       {
         name: "work session1",
         set() {
-          selectedPreset.value = "UBC AI Safety";
+          selectedPreset.value = "Co-working session";
           selectedPresetStage.value = "work session1";
 
-          bottomRightNotes.value = `Talk to a host for demos (short 2-min max show and tell)`;
+          bottomRightNotes.value = "";
           mainContentState.value = "timer";
           countdownToTime.value =
             currentTimePlusMinutesRoundedToNearest5Minutes(40);
@@ -271,7 +271,7 @@ export const presets: {
       {
         name: "break",
         set() {
-          selectedPreset.value = "UBC AI Safety";
+          selectedPreset.value = "Co-working session";
           selectedPresetStage.value = "break";
 
           mainContentState.value = "timer";
@@ -283,7 +283,7 @@ export const presets: {
       {
         name: "work session2",
         set() {
-          selectedPreset.value = "UBC AI Safety";
+          selectedPreset.value = "Co-working session";
           selectedPresetStage.value = "work session2";
 
           mainContentState.value = "timer";
@@ -295,7 +295,7 @@ export const presets: {
       {
         name: "demos",
         set() {
-          selectedPreset.value = "UBC AI Safety";
+          selectedPreset.value = "Co-working session";
           selectedPresetStage.value = "demos";
 
           mainContentState.value = "text";
@@ -305,7 +305,7 @@ export const presets: {
       {
         name: "closing",
         set() {
-          selectedPreset.value = "UBC AI Safety";
+          selectedPreset.value = "Co-working session";
           selectedPresetStage.value = "closing";
 
           mainContentState.value = "text";
