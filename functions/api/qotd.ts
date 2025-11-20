@@ -147,22 +147,17 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   // Shuffle the question bank to ensure variety
   shuffleArray(questionBank);
 
-  const response = await openai.responses.create({
-    model: "openai/gpt-5.1",
-    input: [
+  const response = await openai.chat.completions.create({
+    model: "openai/gpt-4o",
+    messages: [
       {
         role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: `Make 15 ice-breaker question like these:\n${questionBank.join("\n")}\n The first 5 questions should be taken from the examples. The next 5 questions should be similar to but not taken from the examples. The last 5 questions should be related to the user's location and the current date. Location: ${userLocation}\nDate: ${currentDate}`,
-          },
-        ],
+        content: `Make 15 ice-breaker question like these:\n${questionBank.join("\n")}\n The first 5 questions should be taken from the examples. The next 5 questions should be similar to but not taken from the examples. The last 5 questions should be related to the user's location and the current date. Location: ${userLocation}\nDate: ${currentDate}`,
       }
     ],
-    text: {
-      format: {
-        type: "json_schema",
+    response_format: {
+      type: "json_schema",
+      json_schema: {
         name: "ice_breaker_questions",
         strict: true,
         schema: {
@@ -182,13 +177,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         },
       },
     },
-    tools: [],
     temperature: 1,
-    max_output_tokens: 2048,
+    max_tokens: 2048,
     top_p: 1,
   });
 
-  return new Response(response.output_text, {
+  return new Response(response.choices[0].message.content, {
     headers: {
       "Content-Type": "application/json",
     },
