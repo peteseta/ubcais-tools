@@ -1,0 +1,45 @@
+[
+  {
+    "name": "AI Alignment",
+    "prompts": [
+      { "text": "AI alignment is technically solvable before AGI arrives" },
+      { "text": "Recursive self-improvement will lead to a rapid intelligence explosion" },
+      { "text": "Current AI systems already pose meaningful alignment risks" },
+      { "text": "Interpretability research alone is sufficient to solve AI alignment" },
+      { "text": "We should expect misaligned AI to behave deceptively before deployment" }
+    ]
+  },
+  {
+    "name": "AI Governance",
+    "prompts": [
+      { "text": "AI development should be paused until safety is better understood" },
+      { "text": "Open-source AI models do more harm than good" },
+      { "text": "Governments should have direct oversight of frontier AI labs" },
+      { "text": "Racing dynamics between AI labs make catastrophic outcomes more likely" },
+      { "text": "International AI governance treaties are achievable and effective" }
+    ]
+  },
+  {
+    "name": "AI Risk",
+    "prompts": [
+      { "text": "Existential risk from AI is the most pressing problem facing humanity today" },
+      { "text": "Short-term AI harms deserve more attention than long-term existential risk" },
+      { "text": "P(doom) from AI exceeds 10%" },
+      { "text": "The AI Safety community is too focused on speculative long-term risks" },
+      { "text": "Misaligned superintelligence is a more likely catastrophe than misuse by humans" }
+    ]
+  },
+  {
+    "name": "AI & Society",
+    "prompts": [
+      { "text": "AI will create more jobs than it destroys" },
+      {
+        "text": "AI safety guardrails are just corporate liability shields, not genuine ethics",
+        "subtitle": "Governments are literally calling safety features 'virtue signaling.' Is safety research a moral project or a PR one?"
+      },
+      { "text": "AI systems should be required to be explainable before deployment in high-stakes domains" },
+      { "text": "Universal Basic Income is necessary in a world with advanced AI" },
+      { "text": "The benefits of AI will be distributed equitably across society" }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "phases": [
+    { "name": "Group Prep",         "short": "Prep",    "duration": 180 },
+    { "name": "Opening — Agree",    "short": "Opening", "duration": 60,  "side": "agree"    },
+    { "name": "Opening — Disagree", "short": "Opening", "duration": 60,  "side": "disagree" },
+    { "name": "Open Debate",        "short": "Debate",  "duration": 240 },
+    { "name": "Closing — Agree",    "short": "Closing", "duration": 30,  "side": "agree"    },
+    { "name": "Closing — Disagree", "short": "Closing", "duration": 30,  "side": "disagree" },
+    { "name": "Audience Vote",      "short": "Vote",    "duration": 0   }
+  ]
+}
