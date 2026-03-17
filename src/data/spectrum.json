@@ -30,6 +30,27 @@
     ]
   },
   {
+    "name": "March 2026 Spectrum",
+    "prompts": [
+      {
+        "text": "Frontier Safety Frameworks are security theater",
+        "subtitle": "12 companies published or updated Frontier Safety Frameworks in 2025, but the International AI Safety Report notes they vary widely in the risks they cover. Are self-reported safety docs meaningless without external enforcement?"
+      },
+      {
+        "text": "AI labs that accept government defense contracts forfeit the right to call themselves safety-focused",
+        "subtitle": "If your alignment research is funded by the same entity deploying your model for lethal autonomous systems, is the mission compromised?"
+      },
+      {
+        "text": "A rogue AI is less dangerous than an obedient one in the wrong hands",
+        "subtitle": "The AI safety field has historically focused on the risk of AI systems developing goals misaligned with humans. But as governments and militaries race to deploy AI, is the scarier scenario AI that works perfectly, just for the wrong people?"
+      },
+      {
+        "text": "America's AI safety movement is just imperialism with better branding",
+        "subtitle": "The US declined to back the second International AI Safety Report in February 2026, the largest global AI safety collaboration ever assembled. Simultaneously, the US frames chip export controls to China as a safety measure, while American VC-backed labs dominate the global narrative on what \"responsible AI development\" means."
+      }
+    ]
+  },
+  {
     "name": "AI & Society",
     "prompts": [
       { "text": "AI will create more jobs than it destroys" },
