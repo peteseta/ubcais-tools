@@ -403,11 +403,37 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     justify-content: center;
     position: relative;
     background: colors.$primary-bg;
+
+    // Symmetric edge strips — balanced regardless of label word length
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      transition: opacity 0.4s ease;
+    }
+
+    &::before {
+      left: 0;
+      background: colors.$accent-dark;
+      opacity: 0.18;
+    }
+
+    &::after {
+      right: 0;
+      background: colors.$accent-primary;
+      opacity: 0.18;
+    }
+
+    &:has(.side-label.left.highlight)::before  { opacity: 0.7; }
+    &:has(.side-label.right.highlight)::after  { opacity: 0.7; }
   }
 
   .side-label {
     position: absolute;
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-weight: 800;
     font-family: "IBM Plex Sans", sans-serif;
     text-transform: uppercase;
@@ -418,28 +444,28 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     user-select: none;
 
     &.left {
-      left: 1.5rem;
+      left: 1.25rem;
       top: 50%;
       transform: translateY(-50%) rotate(180deg);
       color: colors.$accent-dark;
-      opacity: 0.25;
+      opacity: 0.2;
 
       &.highlight {
-        opacity: 0.9;
-        font-size: 4.5rem;
+        opacity: 0.85;
+        font-size: 4rem;
       }
     }
 
     &.right {
-      right: 1.5rem;
+      right: 1.25rem;
       top: 50%;
       transform: translateY(-50%);
       color: colors.$accent-primary;
-      opacity: 0.25;
+      opacity: 0.2;
 
       &.highlight {
-        opacity: 0.9;
-        font-size: 4.5rem;
+        opacity: 0.85;
+        font-size: 4rem;
       }
     }
   }
@@ -482,7 +508,8 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       transition: background 0.4s;
     }
 
-    &.done:not(:first-child)::before {
+    &.done:not(:first-child)::before,
+    &.active:not(:first-child)::before {
       background: rgba(colors.$accent-primary, 0.25);
     }
 
@@ -554,8 +581,9 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-family: "IBM Plex Serif", serif;
     font-style: italic;
     text-align: center;
+    text-wrap: balance;
     color: colors.$primary-text;
-    line-height: 1.5;
+    line-height: 1.1;
     min-height: 120px;
     display: flex;
     align-items: center;
@@ -566,9 +594,10 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-size: 1rem;
     font-family: "IBM Plex Sans", sans-serif;
     text-align: center;
+    text-wrap: balance;
     color: rgba(colors.$primary-text, 0.38);
     line-height: 1.55;
-    margin-top: 0.75rem;
+    margin-top: 2.5rem;
   }
 
   .timer-container {
