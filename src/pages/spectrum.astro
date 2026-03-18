@@ -133,8 +133,6 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
               class={`phase-step${phase.side ? ` side-${phase.side}` : ''}`}
               data-name={phase.name}
               data-short={phase.short}
-              data-duration={phase.duration}
-              data-side={phase.side ?? ''}
             >
               <div class="step-dot"></div>
               <div class="step-label">{phase.short}</div>
@@ -1096,20 +1094,17 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 </style>
 
 <script>
+  import debateConfig from "../data/debate-config.json";
+  import { formatPhaseTime, normalizePhases } from "../lib/spectrumTimer.js";
+
   // ── Types ─────────────────────────────────────────────────
 
   type Phase = { name: string; duration: number; side?: 'disagree' | 'agree' };
   type Prompt = { text: string; subtitle: string };
 
-  // ── Phases from DOM (rendered from debate-config.json) ────
+  // ── Phases from debate-config.json ────────────────────────
 
-  const PHASES: Phase[] = Array.from(
-    document.querySelectorAll<HTMLElement>('#displayPage .phase-step')
-  ).map(el => ({
-    name: el.dataset.name!,
-    duration: parseInt(el.dataset.duration!),
-    side: (el.dataset.side || undefined) as 'disagree' | 'agree' | undefined,
-  }));
+  const PHASES: Phase[] = normalizePhases(debateConfig.phases);
 
   // ── State ─────────────────────────────────────────────────
 
@@ -1145,6 +1140,10 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
   // ── Helpers ───────────────────────────────────────────────
 
+  const setHidden = (el: HTMLElement, hidden: boolean) => {
+    el.classList.toggle('hidden', hidden);
+  };
+
   const playSound = () => {
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
@@ -1159,12 +1158,44 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     osc.stop(ctx.currentTime + 0.5);
   };
 
-  const formatTime = (s: number) =>
-    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-
   const autoResize = (ta: HTMLTextAreaElement) => {
     ta.style.height = 'auto';
     ta.style.height = ta.scrollHeight + 'px';
+  };
+
+  const showPage = (page: HTMLDivElement) => {
+    setHidden(configPage, page !== configPage);
+    setHidden(explainerPage, page !== explainerPage);
+    setHidden(displayPage, page !== displayPage);
+  };
+
+  const collectPrompts = () =>
+    Array.from(promptsList.querySelectorAll<HTMLDivElement>('.prompt-item'))
+      .map(item => ({
+        text: (item.querySelector('.prompt-main') as HTMLTextAreaElement)?.value.trim() ?? '',
+        subtitle: (item.querySelector('.prompt-subtitle-input') as HTMLTextAreaElement)?.value.trim() ?? '',
+      }))
+      .filter(p => p.text.length > 0);
+
+  const setPromptIndex = (nextIndex: number) => {
+    currentPromptIndex = nextIndex;
+    updatePromptDisplay();
+    updateNavigationButtons();
+    resetToIdle();
+  };
+
+  const setTimerControls = ({
+    showStart = false,
+    showNext = false,
+    showStop = false,
+  }: {
+    showStart?: boolean;
+    showNext?: boolean;
+    showStop?: boolean;
+  } = {}) => {
+    setHidden(startDebateBtn, !showStart);
+    setHidden(nextPhaseBtn, !showNext);
+    setHidden(stopTimerBtn, !showStop);
   };
 
   // ── Config page: prompt inputs ────────────────────────────
@@ -1221,36 +1252,27 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   addPromptBtn.addEventListener('click', () => addPromptInput());
 
   startSessionBtn.addEventListener('click', () => {
-    prompts = Array.from(promptsList.querySelectorAll<HTMLDivElement>('.prompt-item'))
-      .map(item => ({
-        text: (item.querySelector('.prompt-main') as HTMLTextAreaElement)?.value.trim() ?? '',
-        subtitle: (item.querySelector('.prompt-subtitle-input') as HTMLTextAreaElement)?.value.trim() ?? '',
-      }))
-      .filter(p => p.text.length > 0);
+    prompts = collectPrompts();
 
     if (prompts.length === 0) {
       alert('Please add at least one prompt');
       return;
     }
     currentPromptIndex = 0;
-    configPage.classList.add('hidden');
-    explainerPage.classList.remove('hidden');
+    showPage(explainerPage);
   });
 
   // ── Display page ──────────────────────────────────────────
 
   const showDisplayPage = () => {
-    configPage.classList.add('hidden');
-    displayPage.classList.remove('hidden');
+    showPage(displayPage);
     updatePromptDisplay();
     updateNavigationButtons();
     resetToIdle();
   };
 
   const showConfigPage = () => {
-    displayPage.classList.add('hidden');
-    explainerPage.classList.add('hidden');
-    configPage.classList.remove('hidden');
+    showPage(configPage);
     clearTimer();
   };
 
@@ -1303,12 +1325,10 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     currentPhaseIndex = -1;
     timerDisplay.textContent = '00:00';
     timerDisplay.classList.remove('warning');
-    sideIndicator.classList.add('hidden');
+    setHidden(sideIndicator, true);
     leftLabel.classList.remove('highlight');
     rightLabel.classList.remove('highlight');
-    startDebateBtn.classList.remove('hidden');
-    nextPhaseBtn.classList.add('hidden');
-    stopTimerBtn.classList.add('hidden');
+    setTimerControls({ showStart: true });
     resetStepper();
   };
 
@@ -1316,11 +1336,11 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     if (side) {
       sideIndicator.textContent = side === 'disagree' ? 'DISAGREE SPEAKS' : 'AGREE SPEAKS';
       sideIndicator.className = `side-indicator ${side}`;
-      sideIndicator.classList.remove('hidden');
+      setHidden(sideIndicator, false);
       leftLabel.classList.toggle('highlight', side === 'disagree');
       rightLabel.classList.toggle('highlight', side === 'agree');
     } else {
-      sideIndicator.classList.add('hidden');
+      setHidden(sideIndicator, true);
       leftLabel.classList.remove('highlight');
       rightLabel.classList.remove('highlight');
     }
@@ -1331,13 +1351,16 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     currentPhaseIndex = index;
     const phase = PHASES[index];
 
+    if (!phase) {
+      resetToIdle();
+      return;
+    }
+
     timerDisplay.classList.remove('warning');
     updateSideDisplay(phase.side);
     updateStepper(index);
 
-    startDebateBtn.classList.add('hidden');
-    stopTimerBtn.classList.add('hidden');
-    nextPhaseBtn.classList.add('hidden');
+    setTimerControls();
 
     if (phase.duration === 0) {
       timerDisplay.textContent = '—';
@@ -1345,19 +1368,18 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     }
 
     let timeLeft = phase.duration;
-    timerDisplay.textContent = formatTime(timeLeft);
-    stopTimerBtn.classList.remove('hidden');
+    timerDisplay.textContent = formatPhaseTime(timeLeft);
+    setTimerControls({ showStop: true });
 
     timerInterval = window.setInterval(() => {
       timeLeft--;
-      timerDisplay.textContent = formatTime(timeLeft);
+      timerDisplay.textContent = formatPhaseTime(timeLeft);
       if (timeLeft <= 10 && timeLeft > 0) timerDisplay.classList.add('warning');
       if (timeLeft <= 0) {
         clearTimer();
         playSound();
         timerDisplay.classList.add('warning');
-        stopTimerBtn.classList.add('hidden');
-        if (index < PHASES.length - 1) nextPhaseBtn.classList.remove('hidden');
+        setTimerControls({ showNext: index < PHASES.length - 1 });
       }
     }, 1000);
   };
@@ -1373,16 +1395,15 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   stopTimerBtn.addEventListener('click', () => {
     clearTimer();
     timerDisplay.classList.remove('warning');
-    stopTimerBtn.classList.add('hidden');
-    if (currentPhaseIndex < PHASES.length - 1) nextPhaseBtn.classList.remove('hidden');
+    setTimerControls({ showNext: currentPhaseIndex < PHASES.length - 1 });
   });
 
   prevPromptBtn.addEventListener('click', () => {
-    if (currentPromptIndex > 0) { currentPromptIndex--; updatePromptDisplay(); updateNavigationButtons(); resetToIdle(); }
+    if (currentPromptIndex > 0) setPromptIndex(currentPromptIndex - 1);
   });
 
   nextPromptBtn.addEventListener('click', () => {
-    if (currentPromptIndex < prompts.length - 1) { currentPromptIndex++; updatePromptDisplay(); updateNavigationButtons(); resetToIdle(); }
+    if (currentPromptIndex < prompts.length - 1) setPromptIndex(currentPromptIndex + 1);
   });
 
   backToConfigBtn.addEventListener('click', showConfigPage);
@@ -1392,7 +1413,6 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     if (!explainerPage.classList.contains('hidden')) {
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        explainerPage.classList.add('hidden');
         showDisplayPage();
       }
       return;
