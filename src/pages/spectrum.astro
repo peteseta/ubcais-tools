@@ -58,6 +58,68 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       </div>
     </div>
 
+    <!-- Explainer Page -->
+    <div id="explainerPage" class="explainer-page hidden">
+
+      <h1 class="explainer-title"><span>How it works</span></h1>
+
+      <!-- Room Layout -->
+      <section class="exp-section">
+        <h2 class="exp-label">Room Layout</h2>
+        <div class="room-diagram">
+          <div class="room-side room-disagree">
+            <span class="room-side-label">Disagree</span>
+          </div>
+          <div class="room-aisle"></div>
+          <div class="room-side room-agree">
+            <span class="room-side-label">Agree</span>
+          </div>
+        </div>
+        <p class="room-hint">Stand on the side that matches your view. Move if you change your mind.</p>
+      </section>
+
+      <!-- Screen Preview -->
+      <section class="exp-section">
+        <h2 class="exp-label">On Screen</h2>
+        <div class="screen-preview">
+          <div class="sp-side sp-left">DISAGREE</div>
+          <div class="sp-center">
+            <div class="sp-stepper">
+              <div class="sp-dot"></div>
+              <div class="sp-line"></div>
+              <div class="sp-dot sp-dot-active"></div>
+              <div class="sp-line"></div>
+              <div class="sp-dot"></div>
+              <div class="sp-line"></div>
+              <div class="sp-dot"></div>
+            </div>
+            <div class="sp-prompt-block">
+              <div class="sp-prompt-line sp-line-long"></div>
+              <div class="sp-prompt-line sp-line-med"></div>
+            </div>
+            <div class="sp-timer">00:00</div>
+          </div>
+          <div class="sp-side sp-right">AGREE</div>
+        </div>
+      </section>
+
+      <!-- Debate Flow -->
+      <section class="exp-section">
+        <h2 class="exp-label">Debate Format</h2>
+        <div class="phase-stepper explainer-stepper">
+          {phases.map((phase) => (
+            <div class={`phase-step${phase.side ? ` side-${phase.side}` : ''}`}>
+              <div class="step-dot"></div>
+              <div class="step-label">{phase.short}</div>
+              <div class="step-dur">{fmtTime(phase.duration)}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div class="explainer-hint"><kbd>Space</kbd> to continue</div>
+    </div>
+
     <!-- Display Page -->
     <div id="displayPage" class="display-page hidden">
       <div class="side-label left">DISAGREE</div>
@@ -114,6 +176,9 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
 <style lang="scss">
   @use "../colors.scss";
+
+  $disagree-color: #dc2626;
+  $agree-color: #16a34a;
 
   main {
     width: 100vw;
@@ -393,6 +458,276 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     }
   }
 
+  // ── Explainer Page ────────────────────────────────────────
+
+  .explainer-page {
+    width: 100%;
+    height: 100%;
+    background: colors.$primary-bg;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 3rem 4rem 4rem;
+    position: relative;
+    overflow-y: auto;
+  }
+
+  .explainer-title {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(colors.$primary-text, 0.3);
+    text-align: center;
+    margin: 0;
+
+    span {
+      display: block;
+      font-family: "IBM Plex Serif", serif;
+      font-style: italic;
+      font-size: 2.4rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      color: colors.$primary-text;
+      margin-top: 0.2rem;
+    }
+  }
+
+  .exp-section {
+    width: 100%;
+    max-width: 860px;
+  }
+
+  .exp-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: colors.$accent-primary;
+    opacity: 0.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .room-diagram {
+    display: flex;
+    align-items: stretch;
+    height: 6rem;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    margin-bottom: 0.6rem;
+  }
+
+  .room-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .room-disagree {
+    background: rgba($disagree-color, 0.08);
+    border: 1px solid rgba($disagree-color, 0.2);
+    border-right: none;
+    border-radius: 0.25rem 0 0 0.25rem;
+  }
+
+  .room-agree {
+    background: rgba($agree-color, 0.06);
+    border: 1px solid rgba($agree-color, 0.16);
+    border-left: none;
+    border-radius: 0 0.25rem 0.25rem 0;
+  }
+
+  .room-aisle {
+    width: 1px;
+    background: rgba(colors.$primary-text, 0.06);
+    border-left: 1px dashed rgba(colors.$primary-text, 0.1);
+    border-right: none;
+    flex-shrink: 0;
+  }
+
+  .room-side-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+
+    .room-disagree & { color: $disagree-color; opacity: 0.7; }
+    .room-agree &    { color: $agree-color; opacity: 0.7; }
+  }
+
+  .room-hint {
+    font-size: 0.78rem;
+    color: rgba(colors.$primary-text, 0.28);
+    margin: 0;
+    font-style: italic;
+  }
+
+  // ── Screen Preview ────────────────────────────────────────
+
+  .screen-preview {
+    height: 220px;
+    width: auto;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    display: flex;
+    align-items: stretch;
+    border: 1px solid rgba(colors.$primary-text, 0.07);
+    border-radius: 0.3rem;
+    overflow: hidden;
+    background: rgba(colors.$primary-text, 0.015);
+    position: relative;
+
+    // left/right edge strips mimicking the display page
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+    }
+    &::before { left: 0; background: $disagree-color; opacity: 0.25; }
+    &::after  { right: 0; background: $agree-color;    opacity: 0.25; }
+  }
+
+  .sp-side {
+    width: 2.5rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    user-select: none;
+    opacity: 0.18;
+  }
+
+  .sp-left  { color: $disagree-color; transform: rotate(180deg); }
+  .sp-right { color: $agree-color; }
+
+  .sp-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    padding: 1.5rem 3rem;
+  }
+
+  .sp-stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    opacity: 0.2;
+  }
+
+  .sp-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: rgba(colors.$primary-text, 0.35);
+    flex-shrink: 0;
+
+    &.sp-dot-active {
+      background: colors.$accent-primary;
+      opacity: 1;
+      box-shadow: 0 0 0 3px rgba(colors.$accent-primary, 0.15);
+    }
+  }
+
+  .sp-stepper .sp-line {
+    width: 3rem;
+    height: 1px;
+    background: rgba(colors.$primary-text, 0.15);
+  }
+
+  .sp-prompt-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+  }
+
+  .sp-prompt-line {
+    height: 0.6rem;
+    border-radius: 0.3rem;
+    background: rgba(colors.$primary-text, 0.12);
+
+    &.sp-line-long { width: 72%; }
+    &.sp-line-med  { width: 50%; }
+  }
+
+  .sp-timer {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: rgba(colors.$primary-text, 0.12);
+    line-height: 1;
+  }
+
+  // ── Explainer Stepper ─────────────────────────────────────
+
+  .explainer-stepper {
+    pointer-events: none;
+
+    .phase-step {
+      .step-dot {
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+
+      .step-label {
+        font-size: 0.72rem;
+        color: rgba(colors.$primary-text, 0.35);
+      }
+
+      .step-dur {
+        font-size: 0.65rem;
+        color: rgba(colors.$primary-text, 0.2);
+      }
+
+      &.side-agree .step-dot    { background: rgba($agree-color, 0.5); }
+      &.side-disagree .step-dot { background: rgba($disagree-color, 0.5); }
+      &.side-agree .step-label    { color: rgba($agree-color, 0.6); }
+      &.side-disagree .step-label { color: rgba($disagree-color, 0.7); }
+    }
+  }
+
+  .explainer-hint {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    color: rgba(colors.$primary-text, 0.25);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    kbd {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.55rem;
+      background: rgba(colors.$primary-text, 0.08);
+      border: 1px solid rgba(colors.$primary-text, 0.12);
+      border-radius: 0.2rem;
+      padding: 0.1rem 0.3rem;
+    }
+  }
+
   // ── Display Page ──────────────────────────────────────────
 
   .display-page {
@@ -417,13 +752,13 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
     &::before {
       left: 0;
-      background: colors.$accent-dark;
+      background: $disagree-color;
       opacity: 0.18;
     }
 
     &::after {
       right: 0;
-      background: colors.$accent-primary;
+      background: $agree-color;
       opacity: 0.18;
     }
 
@@ -447,7 +782,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       left: 1.25rem;
       top: 50%;
       transform: translateY(-50%) rotate(180deg);
-      color: colors.$accent-dark;
+      color: $disagree-color;
       opacity: 0.2;
 
       &.highlight {
@@ -460,7 +795,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       right: 1.25rem;
       top: 50%;
       transform: translateY(-50%);
-      color: colors.$accent-primary;
+      color: $agree-color;
       opacity: 0.2;
 
       &.highlight {
@@ -562,10 +897,18 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
     &.side-disagree.active {
       .step-dot {
-        background: colors.$accent-dark;
-        box-shadow: 0 0 0 4px rgba(colors.$accent-dark, 0.15);
+        background: $disagree-color;
+        box-shadow: 0 0 0 4px rgba($disagree-color, 0.15);
       }
-      .step-label, .step-dur { color: colors.$accent-dark; }
+      .step-label, .step-dur { color: $disagree-color; }
+    }
+
+    &.side-agree.active {
+      .step-dot {
+        background: $agree-color;
+        box-shadow: 0 0 0 4px rgba($agree-color, 0.15);
+      }
+      .step-label, .step-dur { color: $agree-color; }
     }
   }
 
@@ -638,11 +981,11 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     text-transform: uppercase;
 
     &.disagree {
-      background: colors.$accent-dark;
+      background: $disagree-color;
     }
 
     &.agree {
-      background: colors.$accent-primary;
+      background: $agree-color;
     }
   }
 
@@ -778,6 +1121,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   // ── Elements ──────────────────────────────────────────────
 
   const configPage      = document.getElementById('configPage')      as HTMLDivElement;
+  const explainerPage   = document.getElementById('explainerPage')   as HTMLDivElement;
   const displayPage     = document.getElementById('displayPage')     as HTMLDivElement;
   const promptsList     = document.getElementById('promptsList')     as HTMLDivElement;
   const addPromptBtn    = document.getElementById('addPrompt')       as HTMLButtonElement;
@@ -889,7 +1233,8 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       return;
     }
     currentPromptIndex = 0;
-    showDisplayPage();
+    configPage.classList.add('hidden');
+    explainerPage.classList.remove('hidden');
   });
 
   // ── Display page ──────────────────────────────────────────
@@ -904,6 +1249,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
   const showConfigPage = () => {
     displayPage.classList.add('hidden');
+    explainerPage.classList.add('hidden');
     configPage.classList.remove('hidden');
     clearTimer();
   };
@@ -1043,6 +1389,14 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
   document.addEventListener('keydown', (e) => {
     if (!configPage.classList.contains('hidden')) return;
+    if (!explainerPage.classList.contains('hidden')) {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        explainerPage.classList.add('hidden');
+        showDisplayPage();
+      }
+      return;
+    }
     if (e.key === 'ArrowLeft' && !prevPromptBtn.disabled) prevPromptBtn.click();
     else if (e.key === 'ArrowRight' && !nextPromptBtn.disabled) nextPromptBtn.click();
     else if ((e.key === 'b' || e.key === 'B') && !startDebateBtn.classList.contains('hidden')) runPhase(0);
