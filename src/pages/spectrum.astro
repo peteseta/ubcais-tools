@@ -1104,7 +1104,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   // ── Phases from DOM (rendered from debate-config.json) ────
 
   const PHASES: Phase[] = Array.from(
-    document.querySelectorAll<HTMLElement>('.phase-step')
+    document.querySelectorAll<HTMLElement>('#displayPage .phase-step')
   ).map(el => ({
     name: el.dataset.name!,
     duration: parseInt(el.dataset.duration!),
@@ -1141,7 +1141,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   const stopTimerBtn   = document.getElementById('stopTimer')   as HTMLButtonElement;
   const backToConfigBtn = document.getElementById('backToConfig') as HTMLButtonElement;
 
-  const phaseSteps = Array.from(document.querySelectorAll<HTMLElement>('.phase-step'));
+  const phaseSteps = Array.from(document.querySelectorAll<HTMLElement>('#displayPage .phase-step'));
 
   // ── Helpers ───────────────────────────────────────────────
 
