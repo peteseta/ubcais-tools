@@ -1,0 +1,21 @@
+---
+import DebateAudiencePage from "@/components/Debate/DebateAudiencePage.vue";
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout
+  title="Debate Display — UBC AI Safety"
+  description="Oxford Style Debate audience display."
+>
+  <DebateAudiencePage client:only="vue" />
+</Layout>
+
+<style is:global>
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+</style>
