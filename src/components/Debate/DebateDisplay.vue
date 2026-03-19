@@ -11,7 +11,7 @@ const props = defineProps<{
   currentPromptIndex: number;
   phases: Phase[];
   currentPhaseIndex: number;
-  timerState: "idle" | "running" | "stopped" | "finished";
+  timerState: "idle" | "ready" | "running" | "stopped" | "finished";
   timeRemaining: number;
   isLightTheme: boolean;
 }>();

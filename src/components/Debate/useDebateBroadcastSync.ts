@@ -2,14 +2,20 @@ import { type ComputedRef, nextTick, onMounted, onUnmounted, ref, watch } from "
 
 const CHANNEL_NAME = "debate";
 
+/** Strip Vue reactive proxies so structured clone can serialize the state. */
+function serialize(state: DebateState): DebateState {
+  return JSON.parse(JSON.stringify(state));
+}
+
 export interface DebateState {
   audienceMode: "explainer" | "debate";
   prompts: Array<{ text: string; subtitle: string }>;
   currentPromptIndex: number;
   currentPhaseIndex: number;
-  timerState: "idle" | "running" | "stopped" | "finished";
+  timerState: "idle" | "ready" | "running" | "stopped" | "finished";
   timeRemaining: number;
   isLightTheme: boolean;
+  phases: Array<{ name: string; short?: string; duration: number; side?: "disagree" | "agree" }>;
 }
 
 type Message =
@@ -24,7 +30,7 @@ export function useFacilitatorSync(state: ComputedRef<DebateState>) {
 
     channel.addEventListener("message", (event: MessageEvent<Message>) => {
       if (event.data.type === "REQUEST_STATE") {
-        channel?.postMessage({ type: "STATE_UPDATE", state: state.value });
+        channel?.postMessage({ type: "STATE_UPDATE", state: serialize(state.value) });
       }
     });
 
@@ -32,7 +38,7 @@ export function useFacilitatorSync(state: ComputedRef<DebateState>) {
       state,
       (newState) => {
         nextTick(() => {
-          channel?.postMessage({ type: "STATE_UPDATE", state: newState });
+          channel?.postMessage({ type: "STATE_UPDATE", state: serialize(newState) });
         });
       },
       { deep: true }
@@ -40,7 +46,7 @@ export function useFacilitatorSync(state: ComputedRef<DebateState>) {
 
     // Post initial state
     nextTick(() => {
-      channel?.postMessage({ type: "STATE_UPDATE", state: state.value });
+      channel?.postMessage({ type: "STATE_UPDATE", state: serialize(state.value) });
     });
   });
 

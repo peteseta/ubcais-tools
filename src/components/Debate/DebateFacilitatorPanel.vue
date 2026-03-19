@@ -16,15 +16,17 @@ import { useFacilitatorSync, type DebateState } from "./useDebateBroadcastSync";
 type Phase = { name: string; short?: string; duration: number; side?: "disagree" | "agree" };
 type Prompt = { text: string; subtitle: string };
 
-const PHASES: Phase[] = (debateConfig.phases as Array<Record<string, unknown>>).map((p) => ({
-  name: typeof p.name === "string" ? p.name : "",
-  short: typeof p.short === "string" ? p.short : typeof p.name === "string" ? p.name : "",
-  duration: typeof p.duration === "number" ? p.duration : 0,
-  side:
-    p.side === "agree" || p.side === "disagree"
-      ? (p.side as "agree" | "disagree")
-      : undefined,
-}));
+const phases = ref<Phase[]>(
+  (debateConfig.phases as Array<Record<string, unknown>>).map((p) => ({
+    name: typeof p.name === "string" ? p.name : "",
+    short: typeof p.short === "string" ? p.short : typeof p.name === "string" ? p.name : "",
+    duration: typeof p.duration === "number" ? p.duration : 0,
+    side:
+      p.side === "agree" || p.side === "disagree"
+        ? (p.side as "agree" | "disagree")
+        : undefined,
+  }))
+);
 
 const hasReadyPrompt = computed(() => hasReadyDebatePrompt(prompts.value));
 
@@ -32,7 +34,7 @@ const hasReadyPrompt = computed(() => hasReadyDebatePrompt(prompts.value));
 const prompts = ref<Prompt[]>([{ text: "", subtitle: "" }]);
 const currentPromptIndex = ref(0);
 const currentPhaseIndex = ref(-1);
-const timerState = ref<"idle" | "running" | "stopped" | "finished">("idle");
+const timerState = ref<"idle" | "ready" | "running" | "stopped" | "finished">("idle");
 const timeRemaining = ref(0);
 const audienceMode = ref<"explainer" | "debate">("debate");
 const isLightTheme = ref(false);
@@ -46,6 +48,7 @@ const state = computed<DebateState>(() => ({
   timerState: timerState.value,
   timeRemaining: timeRemaining.value,
   isLightTheme: isLightTheme.value,
+  phases: phases.value,
 }));
 
 useFacilitatorSync(state);
@@ -67,29 +70,23 @@ const resetToIdle = () => {
   timeRemaining.value = 0;
 };
 
-const runPhase = (index: number) => {
-  if (!hasReadyPrompt.value) {
-    return;
-  }
-
+const selectPhase = (index: number) => {
   clearTimer();
-  const phase = PHASES[index];
+  const phase = phases.value[index];
   if (!phase) {
     resetToIdle();
     return;
   }
-
   currentPhaseIndex.value = index;
-
-  if (phase.duration === 0) {
-    timerState.value = "running";
-    timeRemaining.value = 0;
-    return;
-  }
-
   timeRemaining.value = phase.duration;
-  timerState.value = "running";
+  timerState.value = "ready";
+};
 
+const playTimer = () => {
+  const phase = phases.value[currentPhaseIndex.value];
+  if (!phase) return;
+  timerState.value = "running";
+  if (phase.duration === 0) return;
   timerInterval = setInterval(() => {
     timeRemaining.value--;
     if (timeRemaining.value <= 0) {
@@ -100,14 +97,21 @@ const runPhase = (index: number) => {
   }, 1000);
 };
 
-const stopTimer = () => {
+const pauseTimer = () => {
   clearTimer();
   timerState.value = "stopped";
 };
 
+const addTime = () => {
+  timeRemaining.value += 60;
+  if (timerState.value === "finished" || timerState.value === "ready") {
+    playTimer();
+  }
+};
+
 const advancePhase = () => {
   const next = currentPhaseIndex.value + 1;
-  if (next < PHASES.length) runPhase(next);
+  if (next < phases.value.length) selectPhase(next);
 };
 
 // ── Prompt navigation ─────────────────────────────────────
@@ -137,7 +141,7 @@ const updateCurrentSubtitle = (v: string) => {
 const sidebarTimerText = computed(() => {
   if (timerState.value === "idle") return "—";
   if (currentPhaseIndex.value < 0) return "—";
-  const phase = PHASES[currentPhaseIndex.value];
+  const phase = phases.value[currentPhaseIndex.value];
   if (!phase) return "—";
   if (phase.duration === 0) return "—";
   return formatPhaseTime(timeRemaining.value);
@@ -169,18 +173,26 @@ onMounted(() => {
       if (currentPromptIndex.value < prompts.value.length - 1)
         setPromptIndex(currentPromptIndex.value + 1);
     } else if ((e.key === "b" || e.key === "B") && timerState.value === "idle") {
-      runPhase(0);
+      selectPhase(0);
     } else if (
       (e.key === "n" || e.key === "N") &&
-      (timerState.value === "stopped" || timerState.value === "finished")
+      (timerState.value === "ready" ||
+        timerState.value === "stopped" ||
+        timerState.value === "finished")
     ) {
       advancePhase();
+    } else if (
+      e.key === " " &&
+      (timerState.value === "ready" || timerState.value === "stopped")
+    ) {
+      e.preventDefault();
+      playTimer();
     } else if (
       (e.key === "s" || e.key === "S" || e.key === " ") &&
       timerState.value === "running"
     ) {
       e.preventDefault();
-      stopTimer();
+      pauseTimer();
     }
   }
   window.addEventListener("keydown", onKeyDown);
@@ -208,14 +220,36 @@ const previewOuterStyle = computed(() => ({
   height: `${PREVIEW_H * previewScale.value}px`,
 }));
 
+// ── Phase CRUD ────────────────────────────────────────────
+const addPhase = () => {
+  phases.value = [...phases.value, { name: "New Phase", short: "Phase", duration: 60 }];
+};
+
+const deletePhase = (i: number) => {
+  if (i === currentPhaseIndex.value) {
+    resetToIdle();
+  } else if (i < currentPhaseIndex.value) {
+    currentPhaseIndex.value--;
+  }
+  phases.value = phases.value.filter((_, idx) => idx !== i);
+};
+
 // ── Computed UI state ─────────────────────────────────────
-const canStart = computed(() => timerState.value === "idle");
+const canBegin = computed(() => timerState.value === "idle");
+const canPlay = computed(
+  () => timerState.value === "ready" || timerState.value === "stopped"
+);
+const canPause = computed(() => timerState.value === "running");
 const canNext = computed(
   () =>
-    (timerState.value === "stopped" || timerState.value === "finished") &&
-    currentPhaseIndex.value < PHASES.length - 1
+    (timerState.value === "ready" ||
+      timerState.value === "stopped" ||
+      timerState.value === "finished") &&
+    currentPhaseIndex.value < phases.value.length - 1
 );
-const canStop = computed(() => timerState.value === "running");
+const canAddTime = computed(
+  () => timerState.value !== "idle" && (phases.value[currentPhaseIndex.value]?.duration ?? 0) > 0
+);
 const canReset = computed(() => timerState.value !== "idle");
 
 watch(timerState, (nextTimerState, previousTimerState) => {
@@ -319,39 +353,48 @@ watch(timerState, (nextTimerState, previousTimerState) => {
       <div class="sidebar-section">
         <div class="section-label">Phases</div>
         <DebatePhaseStepper
-          :phases="PHASES"
+          :phases="phases"
           :currentPhaseIndex="currentPhaseIndex"
           :timerState="timerState"
-          @jump="(i) => runPhase(i)"
+          @jump="(i) => selectPhase(i)"
+          @update:phases="(v) => (phases = v)"
+          @add="addPhase"
+          @delete="deletePhase"
         />
 
         <div class="phase-actions">
           <button
-            v-if="canStart"
+            v-if="canBegin"
             class="btn-action btn-accent"
             :disabled="!hasReadyPrompt"
-            @click="runPhase(0)"
+            @click="selectPhase(0)"
           >
-            Start Debate
+            Begin Debate
           </button>
-          <button v-if="canNext" class="btn-action btn-accent" @click="advancePhase">
-            Next Phase →
+          <button v-if="canPlay" class="btn-action btn-accent" @click="playTimer">
+            ▶ Play
           </button>
-          <button v-if="canStop" class="btn-action btn-stop" @click="stopTimer">Stop</button>
+          <button v-if="canPause" class="btn-action btn-stop" @click="pauseTimer">
+            ⏸ Pause
+          </button>
+          <button v-if="canAddTime" class="btn-action btn-ghost" @click="addTime">+1 min</button>
+          <button v-if="canNext" class="btn-action btn-ghost" @click="advancePhase">
+            Next →
+          </button>
           <button v-if="canReset" class="btn-action btn-ghost" @click="resetToIdle">Reset</button>
         </div>
 
         <div v-if="timerState !== 'idle'" class="timer-readout">
           <span class="timer-phase-name">
-            {{ currentPhaseIndex >= 0 ? PHASES[currentPhaseIndex]?.name : "" }}
+            {{ currentPhaseIndex >= 0 ? phases[currentPhaseIndex]?.name : "" }}
           </span>
           <span class="timer-value">{{ sidebarTimerText }}</span>
         </div>
 
         <div class="keyboard-hint">
-          <span><kbd>B</kbd> start</span>
-          <span><kbd>N</kbd> next phase</span>
-          <span><kbd>Space</kbd> stop</span>
+          <span><kbd>B</kbd> begin</span>
+          <span><kbd>Space</kbd> play/pause</span>
+          <span><kbd>N</kbd> next</span>
         </div>
       </div>
     </div>
@@ -362,14 +405,14 @@ watch(timerState, (nextTimerState, previousTimerState) => {
         <div class="preview-inner" :style="previewInnerStyle">
           <DebateExplainer
             v-if="audienceMode === 'explainer'"
-            :phases="PHASES"
+            :phases="phases"
             :isLightTheme="isLightTheme"
           />
           <DebateDisplay
             v-else
             :prompts="prompts"
             :currentPromptIndex="currentPromptIndex"
-            :phases="PHASES"
+            :phases="phases"
             :currentPhaseIndex="currentPhaseIndex"
             :timerState="timerState"
             :timeRemaining="timeRemaining"

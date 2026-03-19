@@ -5,18 +5,6 @@ import DebateDisplay from "./DebateDisplay.vue";
 import DebateExplainer from "./DebateExplainer.vue";
 import { useDisplaySync, type DebateState } from "./useDebateBroadcastSync";
 
-type Phase = { name: string; short?: string; duration: number; side?: "disagree" | "agree" };
-
-const PHASES: Phase[] = (debateConfig.phases as Array<Record<string, unknown>>).map((p) => ({
-  name: typeof p.name === "string" ? p.name : "",
-  short: typeof p.short === "string" ? p.short : typeof p.name === "string" ? p.name : "",
-  duration: typeof p.duration === "number" ? p.duration : 0,
-  side:
-    p.side === "agree" || p.side === "disagree"
-      ? (p.side as "agree" | "disagree")
-      : undefined,
-}));
-
 const DEFAULT_STATE: DebateState = {
   audienceMode: "debate",
   prompts: [{ text: "", subtitle: "" }],
@@ -25,6 +13,15 @@ const DEFAULT_STATE: DebateState = {
   timerState: "idle",
   timeRemaining: 0,
   isLightTheme: false,
+  phases: (debateConfig.phases as Array<Record<string, unknown>>).map((p) => ({
+    name: typeof p.name === "string" ? p.name : "",
+    short: typeof p.short === "string" ? p.short : typeof p.name === "string" ? p.name : "",
+    duration: typeof p.duration === "number" ? p.duration : 0,
+    side:
+      p.side === "agree" || p.side === "disagree"
+        ? (p.side as "agree" | "disagree")
+        : undefined,
+  })),
 };
 
 const { displayState } = useDisplaySync();
@@ -73,14 +70,14 @@ onMounted(() => {
   >
     <DebateExplainer
       v-if="effectiveState.audienceMode === 'explainer'"
-      :phases="PHASES"
+      :phases="effectiveState.phases"
       :isLightTheme="effectiveState.isLightTheme"
     />
     <DebateDisplay
       v-else
       :prompts="effectiveState.prompts"
       :currentPromptIndex="effectiveState.currentPromptIndex"
-      :phases="PHASES"
+      :phases="effectiveState.phases"
       :currentPhaseIndex="effectiveState.currentPhaseIndex"
       :timerState="effectiveState.timerState"
       :timeRemaining="effectiveState.timeRemaining"

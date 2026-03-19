@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { removePromptAtIndex } from "@/lib/debatePrompts.js";
 
 type Prompt = { text: string; subtitle: string };
@@ -46,6 +47,48 @@ const updatePromptSubtitle = (i: number, subtitle: string) => {
     props.prompts.map((p, idx) => (idx === i ? { ...p, subtitle } : p))
   );
 };
+
+// ── Drag-to-reorder ───────────────────────────────────────
+const dragFromIndex = ref(-1);
+const dragToIndex = ref(-1);
+
+const dragStart = (i: number) => {
+  dragFromIndex.value = i;
+};
+
+const dragOver = (i: number) => {
+  dragToIndex.value = i;
+};
+
+const drop = () => {
+  const from = dragFromIndex.value;
+  const to = dragToIndex.value;
+  if (from === -1 || to === -1 || from === to) {
+    clearDrag();
+    return;
+  }
+  const newPrompts = [...props.prompts];
+  const [removed] = newPrompts.splice(from, 1);
+  newPrompts.splice(to, 0, removed);
+
+  let newIndex = props.currentPromptIndex;
+  if (props.currentPromptIndex === from) {
+    newIndex = to;
+  } else if (from < props.currentPromptIndex && to >= props.currentPromptIndex) {
+    newIndex--;
+  } else if (from > props.currentPromptIndex && to <= props.currentPromptIndex) {
+    newIndex++;
+  }
+
+  emit("update:prompts", newPrompts);
+  emit("update:currentPromptIndex", newIndex);
+  clearDrag();
+};
+
+const clearDrag = () => {
+  dragFromIndex.value = -1;
+  dragToIndex.value = -1;
+};
 </script>
 
 <template>
@@ -67,9 +110,18 @@ const updatePromptSubtitle = (i: number, subtitle: string) => {
       <div
         v-for="(prompt, i) in prompts"
         :key="i"
-        :class="['prompt-item', { current: i === currentPromptIndex }]"
+        :class="[
+          'prompt-item',
+          { current: i === currentPromptIndex, dragging: i === dragFromIndex, dragover: i === dragToIndex },
+        ]"
+        :draggable="true"
+        @dragstart="dragStart(i)"
+        @dragover.prevent="dragOver(i)"
+        @drop="drop()"
+        @dragend="clearDrag()"
         @click="emit('update:currentPromptIndex', i)"
       >
+        <span class="drag-handle" @click.stop>⠿</span>
         <span class="prompt-index">{{ i + 1 }}</span>
         <div class="prompt-texts">
           <input
@@ -139,9 +191,9 @@ const updatePromptSubtitle = (i: number, subtitle: string) => {
 
 .prompt-item {
   display: grid;
-  grid-template-columns: 1.5rem 1fr 1.25rem;
+  grid-template-columns: auto 1.25rem 1fr 1.25rem;
   align-items: start;
-  gap: 0.4rem;
+  gap: 0.25rem;
   padding: 0.35rem 0.4rem;
   border-radius: 0.2rem;
   cursor: pointer;
@@ -150,12 +202,40 @@ const updatePromptSubtitle = (i: number, subtitle: string) => {
 
   &:hover {
     background: rgba(var(--theme-text), 0.04);
+
+    .drag-handle {
+      opacity: 0.5;
+    }
+
+    .btn-remove {
+      color: rgba(var(--theme-text), 0.4);
+    }
   }
 
   &.current {
     border-color: rgba(var(--theme-accent), 0.35);
     background: rgba(var(--theme-accent), 0.05);
   }
+
+  &.dragging {
+    opacity: 0.4;
+  }
+
+  &.dragover {
+    border-color: rgba(var(--theme-accent), 0.4);
+    background: rgba(var(--theme-accent), 0.05);
+  }
+}
+
+.drag-handle {
+  font-size: 0.8rem;
+  opacity: 0.2;
+  cursor: grab;
+  color: rgba(var(--theme-text), 0.4);
+  transition: opacity 0.1s;
+  user-select: none;
+  padding-top: 0.2rem;
+  line-height: 1;
 }
 
 .prompt-index {
