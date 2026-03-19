@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useElementSize } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import debateConfig from "@/data/debate-config.json";
 import presets from "@/data/spectrum.json";
 import { hasReadyDebatePrompt } from "@/lib/debatePrompts.js";
+import { shouldPlayDebateTimerEndJingle } from "@/lib/debateTimerUiState.js";
 import { formatPhaseTime } from "@/lib/spectrumTimer.js";
+import bingBongJingle from "@/components/SessionBoard/jingles/bing-bong.wav";
 import DebateDisplay from "./DebateDisplay.vue";
 import DebateExplainer from "./DebateExplainer.vue";
 import DebatePhaseStepper from "./DebatePhaseStepper.vue";
@@ -215,6 +217,20 @@ const canNext = computed(
 );
 const canStop = computed(() => timerState.value === "running");
 const canReset = computed(() => timerState.value !== "idle");
+
+watch(timerState, (nextTimerState, previousTimerState) => {
+  if (
+    !shouldPlayDebateTimerEndJingle({
+      role: "facilitator",
+      previousTimerState,
+      nextTimerState,
+    })
+  ) {
+    return;
+  }
+
+  void new Audio(bingBongJingle).play().catch(() => {});
+});
 </script>
 
 <template>
