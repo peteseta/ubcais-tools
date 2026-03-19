@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { isDebateTimerInWarningState } from "@/lib/debateTimerUiState.js";
 import { formatPhaseTime } from "@/lib/spectrumTimer.js";
 
 type Phase = { name: string; short?: string; duration: number; side?: "disagree" | "agree" };
@@ -29,9 +30,12 @@ const timerText = computed(() => {
 
 const isWarning = computed(
   () =>
-    props.timeRemaining <= 10 &&
-    props.timerState === "running" &&
-    props.currentPhaseIndex >= 0
+    isDebateTimerInWarningState({
+      currentPhaseIndex: props.currentPhaseIndex,
+      timeRemaining: props.timeRemaining,
+      timerState: props.timerState,
+      phases: props.phases,
+    })
 );
 
 const activeSide = computed(() => {
