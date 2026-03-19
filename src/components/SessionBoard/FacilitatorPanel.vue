@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useElementSize } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import {
+  getEditorContentType,
+  shouldPlayTimerEndJingle,
+} from "@/lib/sessionBoardUiState.js";
 import QotdGenerator from "./QotdGenerator.vue";
 import SessionBoardDisplay from "./SessionBoardDisplay.vue";
 import StagesStepper from "./StagesStepper.vue";
@@ -20,7 +24,6 @@ import {
   mainContentState,
   qotd,
   qotdLocation,
-  reset,
   stageIndex,
   state,
   topLeftNotes,
@@ -96,19 +99,19 @@ const previewOuterStyle = computed(() => ({
 
 // Current stage content type
 const contentType = computed(
-  () => stages[stageIndex.value]?.content?.type ?? "qotd"
+  () =>
+    getEditorContentType({
+      mainContentState: mainContentState.value,
+      stageContentType: stages[stageIndex.value]?.content?.type,
+    })
 );
 
-// countdownToTime string binding
-const countdownToTimeString = computed({
-  get() {
-    return `${countdownToTime.value.hour}:${String(countdownToTime.value.minute).padStart(2, "0")}`;
-  },
-  set(value: string) {
-    const [hour, minute] = value.split(":").map(Number);
-    countdownToTime.value = { hour, minute };
-  },
-});
+const playJingleOnEnd = computed(() =>
+  shouldPlayTimerEndJingle({
+    mainContentState: mainContentState.value,
+    role: "facilitator",
+  })
+);
 
 // Reset with two-click confirmation
 const resetPending = ref(false);
@@ -141,11 +144,8 @@ onMounted(() => {
       <!-- Header -->
       <div class="sidebar-header">
         <div class="header-top">
+          <a href="/" class="back-btn">← Back</a>
           <span class="tool-title">Session Board</span>
-          <div class="header-actions">
-            <button class="utility-btn" @click="toggleTheme" title="Toggle theme">◐</button>
-            <button class="utility-btn" @click="toggleFullscreen" title="Toggle fullscreen">⛶</button>
-          </div>
         </div>
         <button class="btn-primary" @click="openAudienceView">
           Open Audience View
@@ -199,8 +199,8 @@ onMounted(() => {
         </template>
 
         <!-- Advanced override -->
-        <details class="advanced-details">
-          <summary class="advanced-summary">Advanced</summary>
+        <div class="advanced-details">
+          <div class="advanced-label">Advanced</div>
           <div class="mode-selector">
             <label>
               <input type="radio" :checked="mainContentState === 'qotd'" @change="mainContentState = 'qotd'" />
@@ -215,7 +215,7 @@ onMounted(() => {
               Text
             </label>
           </div>
-        </details>
+        </div>
       </div>
 
       <!-- Notes -->
@@ -233,30 +233,28 @@ onMounted(() => {
         />
       </div>
 
-      <!-- Decoration (collapsed by default) -->
+      <!-- Decoration -->
       <div class="sidebar-section">
-        <details>
-          <summary class="section-label decoration-summary">Decoration</summary>
-          <div class="decoration-grid">
-            <div class="deco-field">
-              <label class="corner-label">Top left</label>
-              <input v-model="topLeftText" class="deco-input" placeholder=":time:" />
-            </div>
-            <div class="deco-field">
-              <label class="corner-label">Top right</label>
-              <input v-model="topRightText" class="deco-input" placeholder="UBC AI Safety" />
-            </div>
-            <div class="deco-field">
-              <label class="corner-label">Bottom left</label>
-              <input v-model="bottomLeftText" class="deco-input" />
-            </div>
-            <div class="deco-field">
-              <label class="corner-label">Bottom right</label>
-              <input v-model="bottomRightText" class="deco-input" />
-            </div>
+        <div class="section-label">Decoration</div>
+        <div class="decoration-grid">
+          <div class="deco-field">
+            <label class="corner-label">Top left</label>
+            <input v-model="topLeftText" class="deco-input" placeholder=":time:" />
           </div>
-          <p class="deco-hint">Use <code>:time:</code> for a live clock.</p>
-        </details>
+          <div class="deco-field">
+            <label class="corner-label">Top right</label>
+            <input v-model="topRightText" class="deco-input" placeholder="UBC AI Safety" />
+          </div>
+          <div class="deco-field">
+            <label class="corner-label">Bottom left</label>
+            <input v-model="bottomLeftText" class="deco-input" />
+          </div>
+          <div class="deco-field">
+            <label class="corner-label">Bottom right</label>
+            <input v-model="bottomRightText" class="deco-input" />
+          </div>
+        </div>
+        <p class="deco-hint">Use <code>:time:</code> for a live clock.</p>
       </div>
 
       <!-- Reset -->
@@ -288,13 +286,17 @@ onMounted(() => {
             :topRightNotes="topRightNotes"
             :bottomLeftNotes="bottomLeftNotes"
             :bottomRightNotes="bottomRightNotes"
-            :playJingleOnEnd="false"
+            :playJingleOnEnd="playJingleOnEnd"
           >
             <template #grain><slot name="grain" /></template>
             <template #light><slot name="light" /></template>
           </SessionBoardDisplay>
         </div>
       </div>
+    </div>
+    <div class="preview-controls">
+      <button class="utility-btn" @click="toggleTheme" title="Toggle theme">◐</button>
+      <button class="utility-btn" @click="toggleFullscreen" title="Toggle fullscreen">⛶</button>
     </div>
   </div>
 </template>
@@ -347,7 +349,7 @@ onMounted(() => {
 .header-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .tool-title {
@@ -356,9 +358,23 @@ onMounted(() => {
   color: rgb(var(--theme-text));
 }
 
-.header-actions {
-  display: flex;
-  gap: 0.25rem;
+.back-btn {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(var(--theme-text), 0.75);
+  background: rgba(var(--theme-bg), 0.5);
+  border: 1px solid rgba(var(--theme-text), 0.14);
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: rgb(var(--theme-text));
+    border-color: rgba(var(--theme-text), 0.3);
+  }
 }
 
 .utility-btn {
@@ -456,15 +472,10 @@ onMounted(() => {
   margin-top: 0.6rem;
 }
 
-.advanced-summary {
+.advanced-label {
   font-size: 0.65rem;
   color: rgba(var(--theme-text), 0.35);
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    color: rgba(var(--theme-text), 0.6);
-  }
+  margin-bottom: 0.25rem;
 }
 
 .mode-selector {
@@ -483,16 +494,6 @@ onMounted(() => {
 }
 
 /* ── Decoration ───────────────────────────────────────── */
-.decoration-summary {
-  cursor: pointer;
-  user-select: none;
-  list-style: none;
-
-  &::-webkit-details-marker {
-    display: none;
-  }
-}
-
 .decoration-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -579,6 +580,16 @@ onMounted(() => {
   }
 }
 
+/* ── Preview controls ─────────────────────────────────── */
+.preview-controls {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.25rem;
+  z-index: 10;
+}
+
 /* ── Preview ──────────────────────────────────────────── */
 .preview-area {
   flex: 1;
@@ -605,5 +616,9 @@ onMounted(() => {
   left: 0;
   background: #f6f2ee;
   font-family: "InterVariable", system-ui, sans-serif;
+
+  :deep(.pill) {
+    z-index: 1;
+  }
 }
 </style>

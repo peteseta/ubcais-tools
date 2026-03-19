@@ -32,7 +32,7 @@ import { Picture } from "astro:assets";
   </FacilitatorPanel>
 </Layout>
 
-<style lang="scss">
+<style lang="scss" is:global>
   @use "inter-ui/variable" with (
     $inter-font-display: swap,
     $inter-font-path: "inter-ui/variable"
@@ -50,4 +50,5 @@ import { Picture } from "astro:assets";
     font-family: "InterVariable", system-ui;
     background-color: #111;
   }
+
 </style>

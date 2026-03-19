@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { shouldPlayTimerEndJingle } from "@/lib/sessionBoardUiState.js";
 import SessionBoardDisplay from "./SessionBoardDisplay.vue";
 import { useDisplaySync } from "./useBroadcastSync";
 
@@ -25,6 +26,13 @@ const state = computed(
       bottomRightNotes: "",
     }
 );
+
+const playJingleOnEnd = computed(() =>
+  shouldPlayTimerEndJingle({
+    mainContentState: state.value.mainContentState,
+    role: "audience",
+  })
+);
 </script>
 
 <template>
@@ -42,7 +50,7 @@ const state = computed(
     :topRightNotes="state.topRightNotes"
     :bottomLeftNotes="state.bottomLeftNotes"
     :bottomRightNotes="state.bottomRightNotes"
-    :playJingleOnEnd="state.mainContentState === 'timer'"
+    :playJingleOnEnd="playJingleOnEnd"
   >
     <template #grain><slot name="grain" /></template>
     <template #light><slot name="light" /></template>

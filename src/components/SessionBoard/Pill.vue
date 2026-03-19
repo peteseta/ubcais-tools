@@ -19,7 +19,6 @@ const props = defineProps<{
 <style lang="scss" scoped>
 .pill {
   position: absolute;
-
   z-index: -1;
 
   font-weight: 600;
