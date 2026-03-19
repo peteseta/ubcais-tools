@@ -1,3 +1,5 @@
+Thank you to atelier ([atelier.place](atelier.place/)) for the original codebase. The session board heavily adapts from [their tooling](https://github.com/atelier-vancouver/website/), which Calvin graciously directed me towards.
+
 # UBC AI Safety Facilitator Tools
 
 This app bundles two browser-based tools used to run UBC AI Safety events:
