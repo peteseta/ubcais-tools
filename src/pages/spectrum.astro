@@ -120,6 +120,18 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       <div class="explainer-hint"><kbd>Space</kbd> to continue</div>
     </div>
 
+    <div class="utility-controls">
+      <div class="utility-control">
+        <span id="themeTooltip" class="utility-tooltip">Use light theme</span>
+        <button id="themeToggle" class="utility-toggle" type="button" aria-label="Use light theme">◐</button>
+      </div>
+
+      <div class="utility-control">
+        <span id="fullscreenTooltip" class="utility-tooltip">Enter fullscreen</span>
+        <button id="fullscreenToggle" class="utility-toggle" type="button" aria-label="Enter fullscreen">⛶</button>
+      </div>
+    </div>
+
     <!-- Display Page -->
     <div id="displayPage" class="display-page hidden">
       <div class="side-label left">DISAGREE</div>
@@ -179,11 +191,26 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   $agree-color: #16a34a;
 
   main {
+    --theme-bg: 17, 17, 17;
+    --theme-surface: 34, 34, 34;
+    --theme-text: 249, 249, 249;
+    --theme-accent: 204, 65, 37;
+    --theme-accent-dark: 154, 3, 30;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
     position: relative;
     font-family: "IBM Plex Sans", sans-serif;
+    background: rgb(var(--theme-bg));
+    color: rgb(var(--theme-text));
+  }
+
+  main.theme-light {
+    --theme-bg: 247, 244, 236;
+    --theme-surface: 255, 250, 242;
+    --theme-text: 44, 37, 31;
+    --theme-accent: 163, 78, 48;
+    --theme-accent-dark: 122, 53, 33;
   }
 
   .hidden {
@@ -198,7 +225,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: colors.$primary-bg;
+    background: rgb(var(--theme-bg));
     padding: 2rem;
     overflow-y: auto;
   }
@@ -206,10 +233,10 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   .config-container {
     max-width: 640px;
     width: 100%;
-    background: colors.$secondary-bg;
+    background: rgb(var(--theme-surface));
     padding: 2.5rem 3rem 3rem;
     border-radius: 0.375rem;
-    border-top: 3px solid colors.$accent-primary;
+    border-top: 3px solid rgb(var(--theme-accent));
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
 
     h1 {
@@ -217,7 +244,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       font-weight: 400;
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      color: rgba(colors.$primary-text, 0.5);
+      color: rgba(var(--theme-text), 0.5);
       margin-bottom: 2.5rem;
       text-align: center;
 
@@ -229,7 +256,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
         font-style: italic;
         letter-spacing: -0.01em;
         text-transform: none;
-        color: colors.$primary-text;
+        color: rgb(var(--theme-text));
         margin-top: 0.2rem;
       }
     }
@@ -239,7 +266,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       font-weight: 600;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: colors.$accent-primary;
+      color: rgb(var(--theme-accent));
       opacity: 0.7;
       margin-bottom: 0.75rem;
     }
@@ -264,16 +291,16 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-weight: 500;
     letter-spacing: 0.04em;
     background: transparent;
-    color: rgba(colors.$primary-text, 0.4);
-    border: 1px solid rgba(colors.$primary-text, 0.12);
+    color: rgba(var(--theme-text), 0.4);
+    border: 1px solid rgba(var(--theme-text), 0.12);
     border-radius: 2rem;
     cursor: pointer;
     font-family: "IBM Plex Sans", sans-serif;
     transition: all 0.15s;
 
     &:hover {
-      background: colors.$accent-primary;
-      border-color: colors.$accent-primary;
+      background: rgb(var(--theme-accent));
+      border-color: rgb(var(--theme-accent));
       color: white;
     }
   }
@@ -293,17 +320,17 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     align-items: start;
     gap: 0.5rem;
     padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(colors.$primary-text, 0.07);
+    border-bottom: 1px solid rgba(var(--theme-text), 0.07);
 
     &:first-child {
-      border-top: 1px solid rgba(colors.$primary-text, 0.07);
+      border-top: 1px solid rgba(var(--theme-text), 0.07);
     }
 
     &::before {
       content: counter(prompt-counter);
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.68rem;
-      color: colors.$accent-primary;
+      color: rgb(var(--theme-accent));
       opacity: 0.55;
       padding-top: 0.58rem;
       text-align: right;
@@ -312,7 +339,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     button {
       background: none;
       border: none;
-      color: rgba(colors.$primary-text, 0.15);
+      color: rgba(var(--theme-text), 0.15);
       cursor: pointer;
       font-size: 1.1rem;
       line-height: 1;
@@ -321,7 +348,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       text-align: center;
 
       &:hover {
-        color: colors.$accent-primary;
+        color: rgb(var(--theme-accent));
       }
     }
   }
@@ -339,14 +366,14 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     padding: 0.5rem 0 0.25rem;
     font-size: 0.95rem;
     font-family: "IBM Plex Sans", sans-serif;
-    color: colors.$primary-text;
+    color: rgb(var(--theme-text));
     resize: none;
     overflow: hidden;
     min-height: 2rem;
     line-height: 1.6;
 
     &::placeholder {
-      color: rgba(colors.$primary-text, 0.18);
+      color: rgba(var(--theme-text), 0.18);
       font-style: italic;
     }
 
@@ -361,14 +388,14 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-size: 0.8rem;
     font-family: "IBM Plex Sans", sans-serif;
     font-style: italic;
-    color: rgba(colors.$primary-text, 0.35);
+    color: rgba(var(--theme-text), 0.35);
     resize: none;
     overflow: hidden;
     min-height: 1.2rem;
     line-height: 1.5;
 
     &::placeholder {
-      color: rgba(colors.$primary-text, 0.12);
+      color: rgba(var(--theme-text), 0.12);
       font-style: italic;
     }
 
@@ -378,7 +405,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   // ── Format Section ────────────────────────────────────────
 
   .format-section {
-    border-left: 2px solid rgba(colors.$accent-primary, 0.2);
+    border-left: 2px solid rgba(var(--theme-accent), 0.2);
     padding-left: 1rem;
   }
 
@@ -390,7 +417,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     flex-direction: column;
     gap: 0.35rem;
     font-size: 0.85rem;
-    color: rgba(colors.$primary-text, 0.45);
+    color: rgba(var(--theme-text), 0.45);
 
     li {
       display: flex;
@@ -402,7 +429,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   .format-time {
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.72rem;
-    color: colors.$accent-primary;
+    color: rgb(var(--theme-accent));
     opacity: 0.65;
     min-width: 3.25rem;
     flex-shrink: 0;
@@ -419,7 +446,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-weight: 500;
     letter-spacing: 0.05em;
     background: none;
-    color: rgba(colors.$primary-text, 0.35);
+    color: rgba(var(--theme-text), 0.35);
     border: none;
     cursor: pointer;
     font-family: "IBM Plex Sans", sans-serif;
@@ -427,7 +454,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     width: auto;
 
     &:hover {
-      color: colors.$accent-primary;
+      color: rgb(var(--theme-accent));
     }
   }
 
@@ -438,7 +465,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    background: colors.$accent-primary;
+    background: rgb(var(--theme-accent));
     color: white;
     border: none;
     border-radius: 0.25rem;
@@ -448,7 +475,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     margin-top: 2rem;
 
     &:hover {
-      background: colors.$accent-dark;
+      background: rgb(var(--theme-accent-dark));
     }
 
     &:active {
@@ -461,7 +488,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   .explainer-page {
     width: 100%;
     height: 100%;
-    background: colors.$primary-bg;
+    background: rgb(var(--theme-bg));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -477,7 +504,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-weight: 400;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: rgba(colors.$primary-text, 0.3);
+    color: rgba(var(--theme-text), 0.3);
     text-align: center;
     margin: 0;
 
@@ -489,7 +516,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       font-weight: 400;
       letter-spacing: -0.01em;
       text-transform: none;
-      color: colors.$primary-text;
+      color: rgb(var(--theme-text));
       margin-top: 0.2rem;
     }
   }
@@ -504,7 +531,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: colors.$accent-primary;
+    color: rgb(var(--theme-accent));
     opacity: 0.6;
     margin-bottom: 0.75rem;
   }
@@ -541,8 +568,8 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
   .room-aisle {
     width: 1px;
-    background: rgba(colors.$primary-text, 0.06);
-    border-left: 1px dashed rgba(colors.$primary-text, 0.1);
+    background: rgba(var(--theme-text), 0.06);
+    border-left: 1px dashed rgba(var(--theme-text), 0.1);
     border-right: none;
     flex-shrink: 0;
   }
@@ -559,7 +586,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
   .room-hint {
     font-size: 0.78rem;
-    color: rgba(colors.$primary-text, 0.28);
+    color: rgba(var(--theme-text), 0.28);
     margin: 0;
     font-style: italic;
   }
@@ -573,10 +600,10 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     max-width: 100%;
     display: flex;
     align-items: stretch;
-    border: 1px solid rgba(colors.$primary-text, 0.07);
+    border: 1px solid rgba(var(--theme-text), 0.07);
     border-radius: 0.3rem;
     overflow: hidden;
-    background: rgba(colors.$primary-text, 0.015);
+    background: rgba(var(--theme-text), 0.015);
     position: relative;
 
     // left/right edge strips mimicking the display page
@@ -632,20 +659,20 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     width: 0.45rem;
     height: 0.45rem;
     border-radius: 50%;
-    background: rgba(colors.$primary-text, 0.35);
+    background: rgba(var(--theme-text), 0.35);
     flex-shrink: 0;
 
     &.sp-dot-active {
-      background: colors.$accent-primary;
+      background: rgb(var(--theme-accent));
       opacity: 1;
-      box-shadow: 0 0 0 3px rgba(colors.$accent-primary, 0.15);
+      box-shadow: 0 0 0 3px rgba(var(--theme-accent), 0.15);
     }
   }
 
   .sp-stepper .sp-line {
     width: 3rem;
     height: 1px;
-    background: rgba(colors.$primary-text, 0.15);
+    background: rgba(var(--theme-text), 0.15);
   }
 
   .sp-prompt-block {
@@ -659,7 +686,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   .sp-prompt-line {
     height: 0.6rem;
     border-radius: 0.3rem;
-    background: rgba(colors.$primary-text, 0.12);
+    background: rgba(var(--theme-text), 0.12);
 
     &.sp-line-long { width: 72%; }
     &.sp-line-med  { width: 50%; }
@@ -670,7 +697,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-size: 2.8rem;
     font-weight: 300;
     letter-spacing: -0.02em;
-    color: rgba(colors.$primary-text, 0.12);
+    color: rgba(var(--theme-text), 0.12);
     line-height: 1;
   }
 
@@ -687,12 +714,12 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
 
       .step-label {
         font-size: 0.72rem;
-        color: rgba(colors.$primary-text, 0.35);
+        color: rgba(var(--theme-text), 0.35);
       }
 
       .step-dur {
         font-size: 0.65rem;
-        color: rgba(colors.$primary-text, 0.2);
+        color: rgba(var(--theme-text), 0.2);
       }
 
       &.side-agree .step-dot    { background: rgba($agree-color, 0.5); }
@@ -710,7 +737,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     text-align: center;
     font-size: 0.6rem;
     letter-spacing: 0.06em;
-    color: rgba(colors.$primary-text, 0.25);
+    color: rgba(var(--theme-text), 0.25);
     white-space: nowrap;
     display: flex;
     align-items: center;
@@ -719,8 +746,8 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     kbd {
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.55rem;
-      background: rgba(colors.$primary-text, 0.08);
-      border: 1px solid rgba(colors.$primary-text, 0.12);
+      background: rgba(var(--theme-text), 0.08);
+      border: 1px solid rgba(var(--theme-text), 0.12);
       border-radius: 0.2rem;
       padding: 0.1rem 0.3rem;
     }
@@ -735,7 +762,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     align-items: center;
     justify-content: center;
     position: relative;
-    background: colors.$primary-bg;
+    background: rgb(var(--theme-bg));
 
     // Symmetric edge strips — balanced regardless of label word length
     &::before,
@@ -836,21 +863,21 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       right: 50%;
       width: 100%;
       height: 1px;
-      background: rgba(colors.$primary-text, 0.08);
+      background: rgba(var(--theme-text), 0.08);
       z-index: 0;
       transition: background 0.4s;
     }
 
     &.done:not(:first-child)::before,
     &.active:not(:first-child)::before {
-      background: rgba(colors.$accent-primary, 0.25);
+      background: rgba(var(--theme-accent), 0.25);
     }
 
     .step-dot {
       width: 0.6rem;
       height: 0.6rem;
       border-radius: 50%;
-      background: rgba(colors.$primary-text, 0.12);
+      background: rgba(var(--theme-text), 0.12);
       z-index: 1;
       position: relative;
       flex-shrink: 0;
@@ -861,7 +888,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.65rem;
       letter-spacing: 0.04em;
-      color: rgba(colors.$primary-text, 0.25);
+      color: rgba(var(--theme-text), 0.25);
       text-align: center;
       line-height: 1.2;
       transition: color 0.3s;
@@ -870,27 +897,27 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     .step-dur {
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.58rem;
-      color: rgba(colors.$primary-text, 0.12);
+      color: rgba(var(--theme-text), 0.12);
       text-align: center;
       transition: color 0.3s;
     }
 
     &.active {
       .step-dot {
-        background: colors.$accent-primary;
-        box-shadow: 0 0 0 4px rgba(colors.$accent-primary, 0.15);
+        background: rgb(var(--theme-accent));
+        box-shadow: 0 0 0 4px rgba(var(--theme-accent), 0.15);
       }
       .step-label {
-        color: colors.$accent-primary;
+        color: rgb(var(--theme-accent));
         font-size: 0.72rem;
         font-weight: 600;
       }
-      .step-dur { color: colors.$accent-primary; }
+      .step-dur { color: rgb(var(--theme-accent)); }
     }
 
     &.done {
-      .step-dot { background: rgba(colors.$primary-text, 0.2); }
-      .step-label, .step-dur { color: rgba(colors.$primary-text, 0.2); }
+      .step-dot { background: rgba(var(--theme-text), 0.2); }
+      .step-label, .step-dur { color: rgba(var(--theme-text), 0.2); }
     }
 
     &.side-disagree.active {
@@ -923,7 +950,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-style: italic;
     text-align: center;
     text-wrap: balance;
-    color: colors.$primary-text;
+    color: rgb(var(--theme-text));
     line-height: 1.1;
     min-height: 120px;
     display: flex;
@@ -936,7 +963,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-family: "IBM Plex Sans", sans-serif;
     text-align: center;
     text-wrap: balance;
-    color: rgba(colors.$primary-text, 0.38);
+    color: rgba(var(--theme-text), 0.38);
     line-height: 1.55;
     margin-top: 2.5rem;
   }
@@ -952,13 +979,13 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     font-size: 7rem;
     font-weight: 300;
     text-align: center;
-    color: colors.$primary-text;
+    color: rgb(var(--theme-text));
     font-family: "IBM Plex Mono", monospace;
     line-height: 1;
     letter-spacing: -0.02em;
 
     &.warning {
-      color: colors.$accent-primary;
+      color: rgb(var(--theme-accent));
       animation: pulse 1s infinite;
     }
   }
@@ -1003,26 +1030,26 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
       letter-spacing: 0.08em;
       text-transform: uppercase;
       background: transparent;
-      color: rgba(colors.$primary-text, 0.2);
-      border: 1px solid rgba(colors.$primary-text, 0.07);
+      color: rgba(var(--theme-text), 0.2);
+      border: 1px solid rgba(var(--theme-text), 0.07);
       border-radius: 2rem;
       cursor: pointer;
       font-family: "IBM Plex Sans", sans-serif;
       transition: all 0.15s;
 
       &:hover {
-        color: rgba(colors.$primary-text, 0.6);
-        border-color: rgba(colors.$primary-text, 0.15);
+        color: rgba(var(--theme-text), 0.6);
+        border-color: rgba(var(--theme-text), 0.15);
       }
 
       &#startDebate,
       &#nextPhase {
-        background: rgba(colors.$accent-primary, 0.7);
+        background: rgba(var(--theme-accent), 0.7);
         color: white;
         border-color: transparent;
 
         &:hover {
-          background: colors.$accent-primary;
+          background: rgb(var(--theme-accent));
         }
       }
 
@@ -1030,8 +1057,8 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
         opacity: 0.15;
         cursor: not-allowed;
         &:hover {
-          color: rgba(colors.$primary-text, 0.2);
-          border-color: rgba(colors.$primary-text, 0.07);
+          color: rgba(var(--theme-text), 0.2);
+          border-color: rgba(var(--theme-text), 0.07);
         }
       }
     }
@@ -1047,7 +1074,7 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     opacity: 0.3;
     font-size: 0.6rem;
     letter-spacing: 0.06em;
-    color: colors.$primary-text;
+    color: rgb(var(--theme-text));
     white-space: nowrap;
 
     span {
@@ -1059,10 +1086,71 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     kbd {
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.55rem;
-      background: rgba(colors.$primary-text, 0.1);
-      border: 1px solid rgba(colors.$primary-text, 0.15);
+      background: rgba(var(--theme-text), 0.1);
+      border: 1px solid rgba(var(--theme-text), 0.15);
       border-radius: 0.2rem;
       padding: 0.1rem 0.3rem;
+    }
+  }
+
+  .utility-controls {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .utility-control {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .utility-tooltip {
+    font-size: 0.55rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(var(--theme-text), 0.3);
+    opacity: 0;
+    transform: translateX(0.2rem);
+    transition: opacity 0.15s ease, transform 0.15s ease, color 0.15s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .utility-control:hover .utility-tooltip,
+  .utility-control:focus-within .utility-tooltip {
+    opacity: 0.9;
+    transform: translateX(0);
+    color: rgba(var(--theme-text), 0.55);
+  }
+
+  .utility-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 0.95rem;
+    line-height: 1;
+    color: rgba(var(--theme-text), 0.32);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: rgba(var(--theme-text), 0.75);
+      transform: scale(1.04);
+      outline: none;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.35;
     }
   }
 
@@ -1090,12 +1178,23 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
         font-size: 3rem;
       }
     }
+
+    .utility-controls {
+      right: 1rem;
+      bottom: 1rem;
+    }
+
+    .utility-tooltip {
+      display: none;
+    }
   }
 </style>
 
 <script>
   import debateConfig from "../data/debate-config.json";
+  import { getFullscreenTooltipText } from "../lib/spectrumFullscreen.js";
   import { formatPhaseTime, normalizePhases } from "../lib/spectrumTimer.js";
+  import { getThemeToggleText } from "../lib/spectrumTheme.js";
 
   // ── Types ─────────────────────────────────────────────────
 
@@ -1112,9 +1211,11 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   let currentPromptIndex = 0;
   let timerInterval: number | null = null;
   let currentPhaseIndex = -1;
+  let isLightTheme = false;
 
   // ── Elements ──────────────────────────────────────────────
 
+  const appRoot         = document.querySelector('main')             as HTMLElement;
   const configPage      = document.getElementById('configPage')      as HTMLDivElement;
   const explainerPage   = document.getElementById('explainerPage')   as HTMLDivElement;
   const displayPage     = document.getElementById('displayPage')     as HTMLDivElement;
@@ -1135,6 +1236,10 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   const nextPhaseBtn   = document.getElementById('nextPhase')   as HTMLButtonElement;
   const stopTimerBtn   = document.getElementById('stopTimer')   as HTMLButtonElement;
   const backToConfigBtn = document.getElementById('backToConfig') as HTMLButtonElement;
+  const themeToggleBtn = document.getElementById('themeToggle') as HTMLButtonElement;
+  const themeTooltip = document.getElementById('themeTooltip') as HTMLSpanElement;
+  const fullscreenToggleBtn = document.getElementById('fullscreenToggle') as HTMLButtonElement;
+  const fullscreenTooltip = document.getElementById('fullscreenTooltip') as HTMLSpanElement;
 
   const phaseSteps = Array.from(document.querySelectorAll<HTMLElement>('#displayPage .phase-step'));
 
@@ -1196,6 +1301,51 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
     setHidden(startDebateBtn, !showStart);
     setHidden(nextPhaseBtn, !showNext);
     setHidden(stopTimerBtn, !showStop);
+  };
+
+  const isFullscreenSupported = () =>
+    Boolean(
+      document.fullscreenEnabled &&
+      typeof document.documentElement.requestFullscreen === 'function' &&
+      typeof document.exitFullscreen === 'function'
+    );
+
+  const isFullscreenActive = () => Boolean(document.fullscreenElement);
+
+  const updateFullscreenControl = () => {
+    const tooltipText = getFullscreenTooltipText({
+      isSupported: isFullscreenSupported(),
+      isFullscreen: isFullscreenActive(),
+    });
+
+    fullscreenTooltip.textContent = tooltipText;
+    fullscreenToggleBtn.setAttribute('aria-label', tooltipText);
+    fullscreenToggleBtn.disabled = !isFullscreenSupported();
+  };
+
+  const toggleFullscreen = async () => {
+    if (!isFullscreenSupported()) {
+      return;
+    }
+
+    try {
+      if (isFullscreenActive()) {
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch (error) {
+      console.error('Failed to toggle fullscreen', error);
+    }
+  };
+
+  const setTheme = (nextIsLightTheme: boolean) => {
+    isLightTheme = nextIsLightTheme;
+    appRoot.classList.toggle('theme-light', isLightTheme);
+
+    const tooltipText = getThemeToggleText(isLightTheme);
+    themeTooltip.textContent = tooltipText;
+    themeToggleBtn.setAttribute('aria-label', tooltipText);
   };
 
   // ── Config page: prompt inputs ────────────────────────────
@@ -1407,6 +1557,11 @@ const closingDur = fmtDuration(getPhase('Closing — Disagree')?.duration ?? 0);
   });
 
   backToConfigBtn.addEventListener('click', showConfigPage);
+  themeToggleBtn.addEventListener('click', () => setTheme(!isLightTheme));
+  fullscreenToggleBtn.addEventListener('click', () => { void toggleFullscreen(); });
+  document.addEventListener('fullscreenchange', updateFullscreenControl);
+  setTheme(false);
+  updateFullscreenControl();
 
   document.addEventListener('keydown', (e) => {
     if (!configPage.classList.contains('hidden')) return;
