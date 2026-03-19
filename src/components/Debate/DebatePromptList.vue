@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { removePromptAtIndex } from "@/lib/debatePrompts.js";
+
 type Prompt = { text: string; subtitle: string };
 type Preset = { name: string; prompts: Array<{ text: string; subtitle?: string }> };
 
@@ -26,11 +28,9 @@ const addPrompt = () => {
 };
 
 const removePrompt = (i: number) => {
-  const next = props.prompts.filter((_, idx) => idx !== i);
-  emit("update:prompts", next);
-  if (props.currentPromptIndex >= next.length) {
-    emit("update:currentPromptIndex", Math.max(0, next.length - 1));
-  }
+  const next = removePromptAtIndex(props.prompts, props.currentPromptIndex, i);
+  emit("update:prompts", next.prompts);
+  emit("update:currentPromptIndex", next.currentPromptIndex);
 };
 
 const updatePromptText = (i: number, text: string) => {

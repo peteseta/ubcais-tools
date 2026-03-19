@@ -3,6 +3,7 @@ import { useElementSize } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import debateConfig from "@/data/debate-config.json";
 import presets from "@/data/spectrum.json";
+import { hasReadyDebatePrompt } from "@/lib/debatePrompts.js";
 import { formatPhaseTime } from "@/lib/spectrumTimer.js";
 import DebateDisplay from "./DebateDisplay.vue";
 import DebateExplainer from "./DebateExplainer.vue";
@@ -22,6 +23,8 @@ const PHASES: Phase[] = (debateConfig.phases as Array<Record<string, unknown>>).
       ? (p.side as "agree" | "disagree")
       : undefined,
 }));
+
+const hasReadyPrompt = computed(() => hasReadyDebatePrompt(prompts.value));
 
 // ── State ─────────────────────────────────────────────────
 const prompts = ref<Prompt[]>([{ text: "", subtitle: "" }]);
@@ -63,6 +66,10 @@ const resetToIdle = () => {
 };
 
 const runPhase = (index: number) => {
+  if (!hasReadyPrompt.value) {
+    return;
+  }
+
   clearTimer();
   const phase = PHASES[index];
   if (!phase) {
@@ -303,7 +310,12 @@ const canReset = computed(() => timerState.value !== "idle");
         />
 
         <div class="phase-actions">
-          <button v-if="canStart" class="btn-action btn-accent" @click="runPhase(0)">
+          <button
+            v-if="canStart"
+            class="btn-action btn-accent"
+            :disabled="!hasReadyPrompt"
+            @click="runPhase(0)"
+          >
             Start Debate
           </button>
           <button v-if="canNext" class="btn-action btn-accent" @click="advancePhase">
@@ -636,6 +648,11 @@ const canReset = computed(() => timerState.value !== "idle");
 
   &:hover {
     opacity: 0.88;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
   }
 }
 
