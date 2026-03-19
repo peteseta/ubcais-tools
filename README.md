@@ -1,46 +1,65 @@
-# Atelier Website
+# UBC AI Safety Facilitator Tools
 
-This website is hosted on Cloudflare Pages and uses Astro as the static site generator.
+This app bundles two browser-based tools used to run UBC AI Safety events:
 
-Check the notion for access to Cloudflare Pages.
+- `Session Board` for co-working sessions, intros, timers, notes, and question-of-the-day prompts
+- `Oxford Style Debate` for live debates with prompt management, timed phases, and audience-facing displays
 
-## 🚀 Project Structure
+It is built with Astro and Vue and is deployed on Cloudflare Pages.
 
-Inside of your Astro project, you'll see the following folders and files:
+## What Each Tool Is For
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+### Session Board
+
+Use the session board when you need a single screen to guide a co-working event. It supports:
+
+- stage-based flow for welcome, intro, work blocks, breaks, demos, and closing
+- timer, text, and question-of-the-day modes
+- editable corner notes and labels
+- a separate audience display view for the projector or TV
+- optional AI-generated question-of-the-day suggestions based on date and location
+
+### Oxford Style Debate
+
+Use the debate tool when you want a structured, timed room debate. It supports:
+
+- editable debate prompts with optional subtitles
+- prompt presets for recurring event themes
+- drag-to-reorder prompt management
+- configurable debate phases and timers
+- audience views for either the live debate screen or a "how it works" explainer
+
+## Routes
+
+- `/` tool picker
+- `/session` session board facilitator panel
+- `/session/display` session board audience display
+- `/spectrum` debate facilitator panel
+- `/spectrum/display` debate audience display
+- `/api/qotd` API endpoint used by the session board question generator
+
+The facilitator and display routes sync through `BroadcastChannel`, so they are meant to be opened from the same browser/profile. The built-in `Open Audience View` buttons handle the normal setup.
+
+## Running Locally
+
+```bash
+pnpm install
+pnpm dev
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Then open `http://localhost:4321`.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Useful commands:
 
-Any static assets, like images, can be placed in the `public/` directory.
+- `pnpm dev` starts the Astro dev server
+- `pnpm build` runs `astro check` and builds the site
+- `pnpm preview` previews the production build locally
+- `node --test test/*.test.mjs` runs the current test suite
 
-## 🧞 Commands
+## Maintainer Notes
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Session board defaults and stages live in `src/data/coworking-config.json`.
+- Debate phase defaults live in `src/data/debate-config.json`.
+- Debate prompt presets live in `src/data/spectrum.json`.
+- The question generator is implemented in `functions/api/qotd.ts` and requires `OPENAI_API_KEY` in the Pages environment.
+- During local Astro dev, `/api` requests are proxied to `https://ubcais-tools.pages.dev/` by `astro.config.mjs`.
