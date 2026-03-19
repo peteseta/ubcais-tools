@@ -1,25 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from "vue";
 import bingBongJingle from "./jingles/bing-bong.wav";
-import { selectedPresetStage } from "./useSessionBoardParams";
 
 const props = defineProps<{
   hour: number;
   minute: number;
+  playJingleOnEnd?: boolean;
 }>();
 
 const time = ref<string>("--:--");
 watchEffect(() => {
-  if (time.value !== "00:00") {
-    return;
-  }
-
-  switch (selectedPresetStage.value) {
-    case "work session1":
-    case "break":
-    case "work session2":
-      new Audio(bingBongJingle).play();
-      break;
+  if (time.value !== "00:00") return;
+  if (props.playJingleOnEnd) {
+    new Audio(bingBongJingle).play();
   }
 });
 
@@ -29,7 +22,6 @@ const targetDate = computed(() => {
   countdownToDate.setMinutes(props.minute);
   countdownToDate.setSeconds(0);
   countdownToDate.setMilliseconds(0);
-
   return countdownToDate;
 });
 
@@ -52,19 +44,13 @@ function updateTime() {
 
 watch(
   () => [props.hour, props.minute],
-  () => {
-    updateTime();
-  }
+  () => updateTime()
 );
 
 onMounted(() => {
   updateTime();
-
   const intervalId = setInterval(updateTime, 1000);
-
-  onUnmounted(() => {
-    clearInterval(intervalId);
-  });
+  onUnmounted(() => clearInterval(intervalId));
 });
 </script>
 

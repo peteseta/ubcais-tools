@@ -1,0 +1,53 @@
+{
+  "name": "Co-working Session",
+  "decoration": {
+    "topLeftText": ":time:",
+    "topRightText": "UBC AI Safety",
+    "bottomLeftText": "",
+    "bottomRightText": ""
+  },
+  "stages": [
+    {
+      "id": "welcome",
+      "label": "Welcome",
+      "content": { "type": "qotd", "qotd": "[TODO: set question of the day]", "qotdLocation": "UBC, Vancouver, BC, Canada" },
+      "notes": { "bottomRight": "Welcome to the co-working session!" }
+    },
+    {
+      "id": "intro",
+      "label": "Intro",
+      "content": { "type": "qotd" },
+      "notes": { "bottomRight": "1. Name\n2. What are you working on?\n3. Question of the day" }
+    },
+    {
+      "id": "work-1",
+      "label": "Work Session 1",
+      "content": { "type": "timer", "timerTitle": "Break Starts", "durationMinutes": 40 },
+      "notes": {}
+    },
+    {
+      "id": "break",
+      "label": "Break",
+      "content": { "type": "timer", "timerTitle": "Break Ends", "durationMinutes": 5 },
+      "notes": {}
+    },
+    {
+      "id": "work-2",
+      "label": "Work Session 2",
+      "content": { "type": "timer", "timerTitle": "Demos Start", "durationMinutes": 40 },
+      "notes": {}
+    },
+    {
+      "id": "demos",
+      "label": "Demos",
+      "content": { "type": "text", "text": "Gather around for demos!" },
+      "notes": {}
+    },
+    {
+      "id": "closing",
+      "label": "Closing",
+      "content": { "type": "text", "text": "Thank you for coming!\n\nSee you next time" },
+      "notes": { "bottomRight": "Learn more at ubcaisafety.org" }
+    }
+  ]
+}
