@@ -10,7 +10,6 @@ import { Picture } from "astro:assets";
   title="Session Board — Display"
   description="UBC AI Safety session board audience display."
 >
-  <a href="/" class="session-display-back-link">← Back</a>
   <div class="display-wrapper">
     <SessionBoardAudiencePage client:only="vue">
       <Picture
@@ -58,29 +57,5 @@ import { Picture } from "astro:assets";
 
   .display-wrapper {
     height: 100vh;
-  }
-
-  .session-display-back-link {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 50;
-    font-family: "IBM Plex Sans", sans-serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: rgba(44, 37, 31, 0.72);
-    background: rgba(246, 242, 238, 0.78);
-    border: 1px solid rgba(44, 37, 31, 0.12);
-    border-radius: 999px;
-    padding: 0.45rem 0.8rem;
-    backdrop-filter: blur(10px);
-  }
-
-  .session-display-back-link:hover {
-    color: rgb(44, 37, 31);
-    border-color: rgba(44, 37, 31, 0.24);
-    background: rgba(246, 242, 238, 0.92);
   }
 </style>
